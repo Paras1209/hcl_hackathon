@@ -3,25 +3,38 @@ import { DEMO_USERS, ROLES } from '../constants/roles';
 
 export const authApi = {
   /**
-   * Logs in a user. Supports demo role presets or standard credentials.
+   * Logs in a user. Supports applicant or officer journeys with automatic role assignment.
    */
-  async login({ email, password, role }) {
+  async login({ email, password, journey, role }) {
     await delay(300);
 
-    // If role requested or recognized demo email
     let user = null;
     if (role && DEMO_USERS[role]) {
       user = DEMO_USERS[role];
-    } else if (email?.includes('checker')) {
-      user = DEMO_USERS.CHECKER;
-    } else if (email?.includes('officer') || email?.includes('maker')) {
-      user = DEMO_USERS.OFFICER;
+    } else if (
+      journey === 'OFFICER' ||
+      email?.toLowerCase().includes('officer') ||
+      email?.toLowerCase().includes('deccan') ||
+      email?.toLowerCase().includes('checker') ||
+      email?.toLowerCase().includes('internal')
+    ) {
+      // Backend automatically authenticates bank staff and assigns the appropriate staff profile
+      if (email?.toLowerCase().includes('checker') || email?.toLowerCase().includes('suresh')) {
+        user = DEMO_USERS.CHECKER;
+      } else {
+        user = DEMO_USERS.OFFICER;
+      }
     } else {
+      // Customer applicant journey
+      const formattedName = email
+        ? email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+        : 'Ravi Kumar Sharma';
+
       user = {
-        id: `USR_${Date.now()}`,
-        name: email.split('@')[0].replace('.', ' '),
-        email,
-        role: role || ROLES.APPLICANT,
+        id: 'USR_APP_01',
+        name: formattedName || 'Ravi Kumar Sharma',
+        email: email || 'ravi.sharma@example.com',
+        role: ROLES.APPLICANT,
         applicationId: 'A2000004',
       };
     }

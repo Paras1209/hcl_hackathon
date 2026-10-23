@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ShieldCheck, Mail, Lock, Phone, User, ArrowRight } from 'lucide-react';
+import { ArrowRight, AlertCircle, ShieldCheck } from 'lucide-react';
 import { authApi } from '../../api/auth';
 import { useToast } from '../../components/Toast';
 
@@ -33,22 +33,22 @@ export default function Register() {
   const validate = () => {
     const newErrors = {};
     if (!formData.fullName || formData.fullName.trim().length < 3) {
-      newErrors.fullName = 'Full legal name is required (min 3 chars)';
+      newErrors.fullName = 'Full legal name is required (min 3 characters).';
     }
-    if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Enter a valid email address';
+    if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
+      newErrors.email = 'Please enter a valid email address.';
     }
-    if (!formData.mobile || !/^[6-9][0-9]{9}$/.test(formData.mobile)) {
-      newErrors.mobile = 'Enter a valid 10-digit Indian mobile number';
+    if (!formData.mobile || !/^[6-9][0-9]{9}$/.test(formData.mobile.trim())) {
+      newErrors.mobile = 'Enter a valid 10-digit Indian mobile number.';
     }
     if (!formData.password || formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters long';
+      newErrors.password = 'Password must be at least 6 characters.';
     }
     if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+      newErrors.confirmPassword = 'Passwords do not match.';
     }
     if (!formData.consentKYC) {
-      newErrors.consentKYC = 'You must grant consent for electronic KYC screening';
+      newErrors.consentKYC = 'You must grant consent for electronic KYC screening.';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -73,25 +73,39 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070a12] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 text-slate-100 font-sans">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <div className="w-10 h-10 rounded-lg bg-blue-600 text-white font-mono font-bold text-base flex items-center justify-center mx-auto shadow-md border border-blue-400/30 mb-3">
-          IQ
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-between py-10 px-4 sm:px-6 lg:px-8 font-sans antialiased text-slate-900">
+      <div className="w-full max-w-md mx-auto">
+        {/* Brand Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-blue-600 text-white font-bold text-lg shadow-sm ring-4 ring-blue-50 mb-3.5">
+            IQ
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            Onboard<span className="text-blue-600">IQ</span>
+          </h1>
+          <p className="mt-1 text-xs font-medium uppercase tracking-wider text-slate-500">
+            Customer KYC Registration
+          </p>
+          <p className="mt-1 text-xs text-slate-400">
+            Create your account to start electronic KYC verification.
+          </p>
         </div>
-        <h2 className="text-xl font-bold font-mono tracking-tight text-white">
-          APPLICANT ONBOARDING // PROFILE SETUP
-        </h2>
-        <p className="mt-1 text-xs text-slate-400 font-mono">
-          Deccan Digital Bank • Digital Savings Account Registration
-        </p>
-      </div>
 
-      <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-[#0b0f19] py-7 px-6 sm:px-8 rounded-xl border border-[#1b253b] shadow-2xl">
-          <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
+        {/* Card */}
+        <div className="bg-white py-8 px-6 sm:px-8 rounded-2xl border border-slate-200/90 shadow-sm">
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+              Create customer profile
+            </h2>
+            <p className="text-xs text-slate-500 mt-1">
+              Enter your legal details as they appear on your government documents.
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div>
-              <label className="block font-mono text-[11px] text-slate-300 mb-1">
-                FULL LEGAL NAME (AS PER GOVT ID) *
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Full Legal Name *
               </label>
               <input
                 type="text"
@@ -99,14 +113,20 @@ export default function Register() {
                 value={formData.fullName}
                 onChange={handleChange}
                 placeholder="Ravi Kumar Sharma"
-                className="w-full px-3 py-2 text-xs font-mono bg-[#070a12] border border-[#1e293b] rounded-lg text-slate-100 focus:outline-none focus:border-blue-500"
+                className={`w-full px-3.5 py-2.5 text-sm rounded-lg border bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-colors ${
+                  errors.fullName
+                    ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-100'
+                    : 'border-slate-300 focus:border-blue-600 focus:ring-blue-100'
+                }`}
               />
-              {errors.fullName && <p className="text-[11px] text-rose-400 mt-1 font-mono">{errors.fullName}</p>}
+              {errors.fullName && (
+                <p className="mt-1.5 text-xs text-rose-600">{errors.fullName}</p>
+              )}
             </div>
 
             <div>
-              <label className="block font-mono text-[11px] text-slate-300 mb-1">
-                EMAIL ADDRESS *
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Email Address *
               </label>
               <input
                 type="email"
@@ -114,101 +134,138 @@ export default function Register() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="ravi.sharma@example.com"
-                className="w-full px-3 py-2 text-xs font-mono bg-[#070a12] border border-[#1e293b] rounded-lg text-slate-100 focus:outline-none focus:border-blue-500"
+                className={`w-full px-3.5 py-2.5 text-sm rounded-lg border bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-colors ${
+                  errors.email
+                    ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-100'
+                    : 'border-slate-300 focus:border-blue-600 focus:ring-blue-100'
+                }`}
               />
-              {errors.email && <p className="text-[11px] text-rose-400 mt-1 font-mono">{errors.email}</p>}
+              {errors.email && (
+                <p className="mt-1.5 text-xs text-rose-600">{errors.email}</p>
+              )}
             </div>
 
             <div>
-              <label className="block font-mono text-[11px] text-slate-300 mb-1">
-                MOBILE NUMBER (+91) *
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Mobile Number (+91) *
               </label>
               <input
-                type="text"
+                type="tel"
                 name="mobile"
                 maxLength={10}
                 value={formData.mobile}
                 onChange={handleChange}
                 placeholder="9876543210"
-                className="w-full px-3 py-2 text-xs font-mono bg-[#070a12] border border-[#1e293b] rounded-lg text-slate-100 focus:outline-none focus:border-blue-500"
+                className={`w-full px-3.5 py-2.5 text-sm rounded-lg border bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-colors ${
+                  errors.mobile
+                    ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-100'
+                    : 'border-slate-300 focus:border-blue-600 focus:ring-blue-100'
+                }`}
               />
-              {errors.mobile && <p className="text-[11px] text-rose-400 mt-1 font-mono">{errors.mobile}</p>}
+              {errors.mobile && (
+                <p className="mt-1.5 text-xs text-rose-600">{errors.mobile}</p>
+              )}
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block font-mono text-[11px] text-slate-300 mb-1">PASSWORD *</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Password *
+                </label>
                 <input
                   type="password"
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="w-full px-3 py-2 text-xs font-mono bg-[#070a12] border border-[#1e293b] rounded-lg text-slate-100 focus:outline-none focus:border-blue-500"
+                  className={`w-full px-3.5 py-2.5 text-sm rounded-lg border bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-colors ${
+                    errors.password
+                      ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-100'
+                      : 'border-slate-300 focus:border-blue-600 focus:ring-blue-100'
+                  }`}
                 />
-                {errors.password && <p className="text-[11px] text-rose-400 mt-1 font-mono">{errors.password}</p>}
+                {errors.password && (
+                  <p className="mt-1.5 text-xs text-rose-600">{errors.password}</p>
+                )}
               </div>
 
               <div>
-                <label className="block font-mono text-[11px] text-slate-300 mb-1">CONFIRM *</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Confirm *
+                </label>
                 <input
                   type="password"
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="w-full px-3 py-2 text-xs font-mono bg-[#070a12] border border-[#1e293b] rounded-lg text-slate-100 focus:outline-none focus:border-blue-500"
+                  className={`w-full px-3.5 py-2.5 text-sm rounded-lg border bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-colors ${
+                    errors.confirmPassword
+                      ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-100'
+                      : 'border-slate-300 focus:border-blue-600 focus:ring-blue-100'
+                  }`}
                 />
                 {errors.confirmPassword && (
-                  <p className="text-[11px] text-rose-400 mt-1 font-mono">{errors.confirmPassword}</p>
+                  <p className="mt-1.5 text-xs text-rose-600">{errors.confirmPassword}</p>
                 )}
               </div>
             </div>
 
             {/* Mandatory KYC Consent Checkbox */}
             <div className="pt-2">
-              <label className="flex items-start gap-2 p-2.5 rounded-lg bg-[#070a12] border border-[#1e293b] cursor-pointer">
+              <label className="flex items-start gap-2.5 p-3 rounded-lg bg-slate-50 border border-slate-200/80 cursor-pointer">
                 <input
                   type="checkbox"
                   name="consentKYC"
                   checked={formData.consentKYC}
                   onChange={handleChange}
-                  className="mt-0.5 w-3.5 h-3.5 text-blue-600 rounded border-slate-700 bg-slate-900 focus:ring-blue-500"
+                  className="mt-0.5 w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
                 />
-                <span className="text-[11px] text-slate-400 leading-relaxed font-sans">
+                <span className="text-xs text-slate-600 leading-relaxed">
                   I grant voluntary consent to Deccan Digital Bank to electronically verify my identity
                   and document specimens against KYC compliance rules and watchlists.
                 </span>
               </label>
               {errors.consentKYC && (
-                <p className="text-[11px] text-rose-400 mt-1 font-mono">{errors.consentKYC}</p>
+                <p className="mt-1.5 text-xs text-rose-600">{errors.consentKYC}</p>
               )}
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-mono font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50 shadow-xs"
+              className="w-full mt-2 py-2.5 px-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold text-sm rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-60 shadow-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/20"
             >
               {loading ? (
-                <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  <span>CREATE PROFILE &amp; OPEN KYC FORM</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <span>Create profile &amp; open KYC form</span>
+                  <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-5 text-center text-xs text-slate-400 font-sans">
-            Already have an active profile?{' '}
-            <Link to="/login" className="text-blue-400 hover:text-blue-300 font-semibold hover:underline">
+          <div className="mt-6 text-center text-xs text-slate-500">
+            Already registered?{' '}
+            <Link
+              to="/login"
+              className="text-blue-600 hover:text-blue-700 font-semibold hover:underline"
+            >
               Sign in
             </Link>
           </div>
         </div>
       </div>
+
+      {/* Subtle Footer */}
+      <footer className="mt-8 text-center text-xs text-slate-400 space-y-1">
+        <div>Secure onboarding · Privacy protected · Deccan Digital Bank</div>
+        <div className="text-[11px] text-slate-400/80">
+          © 2026 Deccan Digital Bank Ltd. All rights reserved.
+        </div>
+      </footer>
     </div>
   );
 }

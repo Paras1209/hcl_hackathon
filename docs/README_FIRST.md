@@ -7,7 +7,11 @@ Welcome to OnboardIQ: Intelligent KYC Onboarding System for Banking
 ### For Team of 4 (3-Hour Hackathon) 👥
 **START HERE:**
 1. **TEAM_WORK_DISTRIBUTION.md** ⭐ - Work distribution for parallel development
-2. **DEV4_YOUR_GUIDE.md** - Detailed guide for Developer 4 (Frontend + Notifications)
+2. **Your Role-Specific Guide:**
+   - **Himanshu (Dev 1):** Focus on rules engine - See TEAM_WORK_DISTRIBUTION.md
+   - **Vaibhav (Dev 2):** Focus on models & auth - See TEAM_WORK_DISTRIBUTION.md
+   - **Paras (Dev 3):** **DEV3_YOUR_GUIDE.md** ⭐ - Workflow & Maker-Checker (YOU)
+   - **Rishabh (Dev 4):** **DEV4_YOUR_GUIDE.md** - Frontend & Notifications
 
 **Reference Documents:**
 - **case_studies.md** - Problem statement (source of truth for requirements)
@@ -46,6 +50,7 @@ Welcome to OnboardIQ: Intelligent KYC Onboarding System for Banking
 ## 👥 Team Work Distribution (3 Hours)
 
 ### Developer 1 - Core Application Flow & Rules Engine
+**Name: Himanshu**
 **Critical Path - Start First**
 - Rules engine (R1-R17) ⭐ MOST IMPORTANT
 - Name matching (Levenshtein)
@@ -56,6 +61,7 @@ Welcome to OnboardIQ: Intelligent KYC Onboarding System for Banking
 **Files:** `services/rules*`, `services/nameMatching.js`, `services/watchlistScreening.js`, `controllers/applicationController.js`
 
 ### Developer 2 - Auth, Models & Document Storage
+**Name: Vaibhav**
 **Foundation - Everyone Depends on This**
 - All Mongoose models (Application, Document, User, etc.)
 - Authentication (JWT + role-based access)
@@ -66,6 +72,7 @@ Welcome to OnboardIQ: Intelligent KYC Onboarding System for Banking
 **Files:** `models/`, `middleware/`, `services/cloudinaryService.js`, `controllers/authController.js`
 
 ### Developer 3 - Workflow, Review & Checker
+**Name: Paras (YOU)**
 **Business Logic - Maker-Checker Flow**
 - Status lifecycle state machine
 - Workflow service (status transitions)
@@ -76,7 +83,8 @@ Welcome to OnboardIQ: Intelligent KYC Onboarding System for Banking
 
 **Files:** `services/workflowService.js`, `modules/workflow/`, `controllers/reviewController.js`, `controllers/checkerController.js`
 
-### Developer 4 - Frontend + Notifications (YOU)
+### Developer 4 - Frontend + Notifications
+**Name: Rishabh**
 **User Experience - Parallel Development**
 - React frontend (all pages)
 - Application form (Aadhaar validation!)
@@ -93,28 +101,28 @@ Welcome to OnboardIQ: Intelligent KYC Onboarding System for Banking
 
 ### Hour 0:15-1:00 - Foundation Phase
 **All devs work independently:**
-- Dev 1: Rules engine + name matching (pure logic, no DB)
-- Dev 2: Models + auth + seed script
-- Dev 3: Workflow logic (pure functions)
-- Dev 4: React setup + auth pages + API client
+- **Himanshu (Dev 1):** Rules engine + name matching (pure logic, no DB)
+- **Vaibhav (Dev 2):** Models + auth + seed script
+- **Paras (Dev 3):** Workflow logic (pure functions - YOU)
+- **Rishabh (Dev 4):** React setup + auth pages + API client
 
 **Sync at 1:00:** Models ready, rules engine tested, auth working
 
 ### Hour 1:00-2:00 - Integration Phase
 **Start connecting pieces:**
-- Dev 1: Application endpoints (use Dev 2's models)
-- Dev 2: Document endpoints + Cloudinary
-- Dev 3: Review/checker endpoints
-- Dev 4: Application form + document upload
+- **Himanshu (Dev 1):** Application endpoints (use Vaibhav's models)
+- **Vaibhav (Dev 2):** Document endpoints + Cloudinary
+- **Paras (Dev 3):** Review/checker endpoints (YOU)
+- **Rishabh (Dev 4):** Application form + document upload
 
 **Sync at 2:00:** Can submit application end-to-end
 
 ### Hour 2:00-3:00 - Finalization
 **Polish and test:**
-- Dev 1: Batch processing + CSV output
-- Dev 2: Dashboard aggregation + security
-- Dev 3: Maker-checker enforcement + mock banking API
-- Dev 4: Email notifications + review/checker UIs
+- **Himanshu (Dev 1):** Batch processing + CSV output
+- **Vaibhav (Dev 2):** Dashboard aggregation + security
+- **Paras (Dev 3):** Maker-checker enforcement + mock banking API (YOU)
+- **Rishabh (Dev 4):** Email notifications + review/checker UIs
 
 **Sync at 2:45:** Quick standup, prioritize remaining work
 
@@ -232,7 +240,8 @@ FRONTEND_URL=http://localhost:5173
 | Document | Purpose | When to Read |
 |----------|---------|--------------|
 | **TEAM_WORK_DISTRIBUTION.md** | Team coordination, file ownership, 3-hour timeline | Before starting work (all devs) |
-| **DEV4_YOUR_GUIDE.md** | Detailed Dev 4 guide with code examples | If you're Developer 4 |
+| **DEV3_YOUR_GUIDE.md** | Detailed Paras (Dev 3) guide with code examples | **YOU - Read this now!** ⭐ |
+| **DEV4_YOUR_GUIDE.md** | Detailed Rishabh (Dev 4) guide with code examples | If you're Rishabh |
 | **case_studies.md** | Problem statement, requirements, rules R1-R17 | When implementing any feature |
 | **CLAUDE.md** | Architecture, models, conventions | Reference during coding |
 | **DECISIONS.md** | Why we chose what we chose | When questioning tech choices |
@@ -330,6 +339,17 @@ Response time: **< 5 minutes during work hours**
 
 **Ready to build? Let's go! 🚀**
 
-**Start with:** TEAM_WORK_DISTRIBUTION.md (all devs) or DEV4_YOUR_GUIDE.md (if you're Dev 4)
+**Paras (YOU) - Start with:** DEV3_YOUR_GUIDE.md ⭐
+
+**Team - Start with:** TEAM_WORK_DISTRIBUTION.md (15 min together), then your role-specific guide
 
 **Remember:** Communication > Code. Over-communicate on Slack. Ask questions early. Test often. Have fun!
+
+---
+
+## 👥 Your Team
+
+- **Himanshu** - Developer 1 (Rules Engine)
+- **Vaibhav** - Developer 2 (Models & Auth)
+- **Paras** - Developer 3 (Workflow & Maker-Checker) **← YOU**
+- **Rishabh** - Developer 4 (Frontend & Notifications)

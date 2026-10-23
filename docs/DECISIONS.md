@@ -15,18 +15,6 @@ Rule: if you cannot explain an entry without looking at AI output, you do not ow
 
 ---
 
-## Example (delete before submission)
-
-### D-000: MongoDB over PostgreSQL
-- **Date / Owner:** Fri 10:30, Ravi
-- **Decision:** Use MongoDB with Mongoose.
-- **Alternatives considered:** PostgreSQL with Prisma, Firebase.
-- **Why:** Team already knows MERN, schema will change often during the hackathon, documents map naturally to our nested data.
-- **Tradeoff accepted:** Weaker relational integrity and joins; we enforce rules in the service layer.
-- **Revisit when:** Data becomes heavily relational or we need multi-row transactions at scale.
-
----
-
 ## Actual Decisions (OnboardIQ)
 
 ### D-001: MongoDB over PostgreSQL
@@ -251,6 +239,22 @@ cron.schedule('0 9 * * *', sendResubmissionReminders);
 cron.schedule('0 * * * *', checkCheckerQueueSLA);
 ```
 
+### D-012: Frontend Architecture & UI System (React 19 + Vite + Tailwind CSS v4)
+- **Date / Owner:** Hackathon Hour 1, Developer 1 (Rishabh Munakhiya - Frontend Architect)
+- **Decision:** Build the complete frontend under `client/` using React 19, Vite, Tailwind CSS v4, Lucide Icons, and Recharts, styled with an institutional "Financial Intelligence Terminal" design system and a clean, light banking login experience.
+- **Alternatives considered:** Next.js (App Router), plain CSS, Material UI / Ant Design.
+- **Why:** Vite delivers instant HMR and builds in ~1.2s, crucial for high velocity. Tailwind v4 gives exact control over digital banking design tokens without bulky third-party component libraries.
+- **Tradeoff accepted:** Client-side routing with React Router instead of SSR.
+- **Revisit when:** Production scale requires server-side rendering for public marketing pages.
+
+### D-013: Modular Service Layer & Preloaded Mock Store (Axios + SessionStorage)
+- **Date / Owner:** Hackathon Hour 1, Developer 1 (Rishabh Munakhiya - Frontend Architect)
+- **Decision:** Decouple all frontend API networking into `client/src/api/` (`applications.js`, `review.js`, `checker.js`, `notifications.js`, `auth.js`) backed by an in-memory/sessionStorage mock database pre-populated with Case Study V1.0 worked examples (A2000001–A2000012).
+- **Alternatives considered:** Hardcoded static data inside JSX components, MSW (Mock Service Worker).
+- **Why:** Full independence allows Developer 1 (frontend) and Developer 2 (backend) to work concurrently. Switching from mock to live backend only requires setting `VITE_API_BASE_URL`.
+- **Tradeoff accepted:** Client-side demo state is stored in browser storage until live backend endpoints are targeted.
+- **Revisit when:** Backend REST API is live and environment variables are connected.
+
 ---
 
 ## Decisions to make (checklist, tick as logged)
@@ -266,8 +270,8 @@ cron.schedule('0 * * * *', checkCheckerQueueSLA);
 - [ ] D-009: Auth strategy (JWT cookie specifics, session duration)
 - [ ] D-010: Validation approach (Zod schema organization)
 - [ ] D-011: Error handling strategy (error codes, user-facing messages)
-- [ ] D-012: Frontend state management (Context API vs Redux vs Zustand vs none)
-- [ ] D-013: API client architecture (Axios vs fetch, interceptors, error handling)
+- [x] D-012: Frontend state management & UI system (Context API + Tailwind v4) ✅
+- [x] D-013: API client architecture (Axios service layer + mock store) ✅
 - [ ] D-014: CSV parsing library (csv-parser vs papaparse vs fast-csv)
 - [ ] D-015: Levenshtein library (fast-levenshtein vs natural vs talisman)
 - [ ] D-016: Testing strategy (unit vs integration split, mocking approach)

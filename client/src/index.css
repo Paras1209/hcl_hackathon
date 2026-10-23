@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, Menlo, monospace;
+    --bg-canvas: #f5f7fa;
+    --bg-surface: #ffffff;
+    --border-subtle: #e3e8ef;
+    --text-navy: #17243a;
+    --text-slate: #667085;
+    --accent-cobalt: #245bdb;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: #f5f7fa;
+    color: #17243a;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  #root {
+    min-height: 100vh;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    background-color: #f5f7fa;
+  }
+}
+
+/* Tabular figures for financial numbers & IDs */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Hairline borders */
+.border-hairline {
+  border-width: 1px;
+  border-color: rgba(227, 232, 239, 0.9);
+}
+
+/* Light & Clean Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Raw document code viewer scrollbar */
+.doc-scroll::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.doc-scroll::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+.doc-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+.doc-scroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

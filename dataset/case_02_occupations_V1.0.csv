@@ -1,0 +1,13 @@
+occupation_code,description,risk_level
+SALARIED_PRIVATE,Salaried - private sector,LOW
+SALARIED_GOVT,Salaried - government,LOW
+PROFESSIONAL,"Doctor, lawyer, chartered accountant",LOW
+STUDENT,Student,LOW
+HOMEMAKER,Homemaker,LOW
+RETIRED,Retired,LOW
+SELF_EMPLOYED,Self-employed,MEDIUM
+BUSINESS_OWNER,Business owner,MEDIUM
+JEWELLER_BULLION_DEALER,Jeweller / bullion dealer,HIGH
+MONEY_CHANGER,Money changer,HIGH
+REAL_ESTATE_AGENT,Real-estate agent,HIGH
+CRYPTO_ASSET_TRADER,Crypto-asset trader,HIGH

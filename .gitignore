@@ -1,5 +1,26 @@
 # Dependencies
 node_modules/
+client/node_modules/
+server/node_modules/
+
+# Production builds
+dist/
+dist-ssr/
+build/
+client/dist/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# System and editor files
 .pnp
 .pnp.js
 

@@ -1,39 +1,48 @@
 /**
- * API Response Shapes (ALL ENDPOINTS)
- * Owned by ALL developers - frozen after initial sync.
+ * Shared Team Contracts (Frozen)
+ * Defined in docs/TEAM_WORK_DISTRIBUTION.md Section "Shared Contracts"
+ * Owned by ALL developers.
  */
 
 /**
+ * Standard API Success Response Shape
  * @typedef {Object} SuccessResponse
  * @property {true} success
- * @property {*} data - varies by endpoint
+ * @property {*} data
  */
-const SuccessResponse = { success: true, data: {} };
+const SuccessResponse = {
+  success: true,
+  data: {},
+};
 
 /**
+ * Standard API Error Response Shape
  * @typedef {Object} ErrorResponse
  * @property {false} success
  * @property {{ code: string, message: string }} error
  */
 const ErrorResponse = {
   success: false,
-  error: { code: 'ERROR_CODE', message: 'Human readable message' },
+  error: {
+    code: 'ERROR_CODE',
+    message: 'Human readable message',
+  },
 };
 
 /**
- * Rules Engine Output (Dev 1 → Dev 3)
+ * Rules Engine Output Contract (Dev 1 -> Dev 3 & ALL)
  * @typedef {Object} RulesResult
  */
 const RulesResult = {
-  decision: 'APPROVE | REVIEW | REJECT',
-  reason_codes: ['CODE1', 'CODE2'],
-  name_match_score: 0.85,
-  risk_category: 'LOW | MEDIUM | HIGH',
-  rekyc_due_date: '2028-10-23',
+  decision: 'APPROVE', // 'APPROVE' | 'REVIEW' | 'REJECT'
+  reason_codes: [],    // e.g. ['NAME_MISMATCH_MINOR']
+  name_match_score: 1.0000, // 4 decimal places
+  risk_category: 'LOW',     // 'LOW' | 'MEDIUM' | 'HIGH' | null
+  rekyc_due_date: '2036-03-04', // 'YYYY-MM-DD' | null
 };
 
 /**
- * Extraction Service Output (Dev 1 → Dev 3)
+ * Extraction Service Output Contract (Dev 1 -> Dev 3)
  * @typedef {Object} ExtractionResult
  */
 const ExtractionResult = {
@@ -47,7 +56,7 @@ const ExtractionResult = {
 };
 
 /**
- * Application Status Enum (Dev 2 → ALL)
+ * Application Status State Machine Values (Dev 2 -> ALL)
  */
 const ApplicationStatus = [
   'SUBMITTED',
@@ -63,12 +72,12 @@ const ApplicationStatus = [
 ];
 
 /**
- * User Roles (Dev 2 → ALL)
+ * User Roles (Dev 2 -> ALL)
  */
 const UserRoles = ['APPLICANT', 'KYC_OFFICER', 'COMPLIANCE_OFFICER'];
 
 /**
- * Workflow Transition (Dev 3 → Dev 2)
+ * Workflow Status Transition Event (Dev 3 -> Dev 2)
  * @typedef {Object} StatusTransition
  */
 const StatusTransition = {
@@ -79,11 +88,11 @@ const StatusTransition = {
 };
 
 /**
- * Email Event (Dev 3 → Dev 4)
+ * Email Notification Event (Dev 3 -> Dev 4)
  * @typedef {Object} EmailEvent
  */
 const EmailEvent = {
-  type: 'APPLICATION_SUBMITTED | DECISION_FINAL | RESUBMISSION_REQUIRED',
+  type: 'APPLICATION_SUBMITTED', // 'APPLICATION_SUBMITTED' | 'DECISION_FINAL' | 'RESUBMISSION_REQUIRED'
   application_id: 'A2000001',
   recipient_email: 'user@example.com',
   data: {},

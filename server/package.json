@@ -4,8 +4,8 @@
   "description": "OnboardIQ KYC Onboarding System - Backend",
   "main": "src/index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
     "seed": "node scripts/seedDatabase.js",
     "test": "node --test src/tests/unit/**/*.test.js",
     "test:vitest": "vitest run",

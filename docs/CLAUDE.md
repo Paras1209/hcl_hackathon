@@ -3,7 +3,7 @@
 Project guide for AI assistants (Claude Code, Antigravity). Read this before every task.
 
 ## Context
-- Hackathon project, team of 4 students, 24-hour limit.
+- Hackathon project, team of 4 students, 5-hour limit.
 - Judges score: architecture, choice-making, scalability, production-readiness.
 - Product: [ONE-LINE DESCRIPTION - fill in tomorrow]
 - Core entities: [e.g. User, Project, Task]

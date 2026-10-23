@@ -14,7 +14,7 @@ import {
   Trash2,
   Eye,
   ShieldCheck,
-  ShieldAlert,
+  X,
 } from 'lucide-react';
 import { OCCUPATIONS, DOCUMENT_TYPES, DOCUMENT_TYPE_LABELS } from '../../constants/statuses';
 import { validateApplicationForm, validateDocumentFile } from '../../utils/validators';
@@ -180,40 +180,40 @@ export default function ApplicationForm() {
   };
 
   return (
-    <div className="space-y-4 max-w-4xl mx-auto">
-      {/* Calm, Premium Stepper Header */}
-      <div className="bg-white rounded-xl border border-slate-200/90 px-6 py-4 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div className="space-y-5 max-w-4xl mx-auto font-sans">
+      {/* Stepper Header */}
+      <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-base font-bold text-slate-900 tracking-tight font-mono">
-              DIGITAL SAVINGS ONBOARDING
-            </h2>
-            <p className="text-xs text-slate-500 font-sans">
-              Electronic KYC Verification &amp; Identity Reconciliation
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+              Digital Savings Account Application
+            </h1>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Electronic KYC Verification &amp; Identity Onboarding
             </p>
           </div>
 
           {/* Stepper Progress */}
-          <div className="flex items-center gap-2 text-xs font-mono">
+          <div className="flex items-center gap-1.5 text-xs">
             {[
-              { num: 1, label: '01 PROFILE' },
-              { num: 2, label: '02 DOCUMENTS' },
-              { num: 3, label: '03 REVIEW' },
+              { num: 1, label: '1. Profile' },
+              { num: 2, label: '2. Documents' },
+              { num: 3, label: '3. Review & Submit' },
             ].map((step, idx) => (
               <React.Fragment key={step.num}>
                 <button
                   type="button"
                   onClick={() => step.num < currentStep && setCurrentStep(step.num)}
                   disabled={step.num > currentStep}
-                  className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-colors flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
                     currentStep === step.num
-                      ? 'bg-blue-600 text-white font-bold'
+                      ? 'bg-blue-600 text-white shadow-xs'
                       : currentStep > step.num
-                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                      : 'text-slate-400 bg-slate-100'
+                      ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                      : 'text-slate-400 bg-slate-100 cursor-not-allowed'
                   }`}
                 >
-                  {currentStep > step.num && <CheckCircle2 className="w-3 h-3 text-emerald-600" />}
+                  {currentStep > step.num && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />}
                   <span>{step.label}</span>
                 </button>
                 {idx < 2 && <span className="text-slate-300">/</span>}
@@ -225,23 +225,23 @@ export default function ApplicationForm() {
 
       {/* STEP 1: PERSONAL & FINANCIAL DETAILS */}
       {currentStep === 1 && (
-        <div className="bg-white rounded-xl border border-slate-200/90 p-6 shadow-xs space-y-5">
-          <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
+        <div className="bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 shadow-xs space-y-6">
+          <div className="border-b border-slate-100 pb-4 flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-bold text-slate-900">Applicant Details</h3>
+              <h2 className="text-base font-bold text-slate-900">Applicant Legal Profile</h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                Information must match government-issued identification cards.
+                Information must match your government-issued identification documents.
               </p>
             </div>
-            <span className="text-[10px] font-mono text-slate-400 uppercase">
-              STEP 1 OF 3
+            <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200">
+              Step 1 of 3
             </span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Full Name */}
             <div className="sm:col-span-2">
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Full Legal Name *
               </label>
               <input
@@ -249,38 +249,40 @@ export default function ApplicationForm() {
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-slate-50/40"
+                className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 bg-slate-50/40 text-slate-900"
               />
               {formErrors.fullName && (
-                <p className="text-[11px] text-rose-600 mt-1">{formErrors.fullName}</p>
+                <p className="text-xs text-rose-600 mt-1.5">{formErrors.fullName}</p>
               )}
             </div>
 
-            {/* DOB */}
+            {/* Date of Birth */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Date of Birth *
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Date of Birth (YYYY-MM-DD) *
               </label>
               <input
                 type="date"
                 name="dob"
                 value={formData.dob}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 text-sm font-mono border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-slate-50/40"
+                className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 bg-slate-50/40 text-slate-900"
               />
-              {formErrors.dob && <p className="text-[11px] text-rose-600 mt-1">{formErrors.dob}</p>}
+              {formErrors.dob && (
+                <p className="text-xs text-rose-600 mt-1.5">{formErrors.dob}</p>
+              )}
             </div>
 
             {/* Gender */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Gender *
               </label>
               <select
                 name="gender"
                 value={formData.gender}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 bg-white text-slate-900"
               >
                 <option value="MALE">Male</option>
                 <option value="FEMALE">Female</option>
@@ -290,8 +292,8 @@ export default function ApplicationForm() {
 
             {/* PAN Number */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                PAN Number *
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                PAN Number (e.g. ABCDE1234F) *
               </label>
               <input
                 type="text"
@@ -299,19 +301,16 @@ export default function ApplicationForm() {
                 maxLength={10}
                 value={formData.panNumber}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 text-sm uppercase font-mono border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-slate-50/40"
+                className="w-full px-3.5 py-2.5 text-sm font-mono uppercase border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 bg-slate-50/40 text-slate-900"
               />
-              <span className="text-[10px] text-slate-400 mt-0.5 block font-mono">
-                Pattern: ^[A-Z]{'{5}'}[0-9]{'{4}'}[A-Z]$, 4th char 'P'
-              </span>
               {formErrors.panNumber && (
-                <p className="text-[11px] text-rose-600 mt-1">{formErrors.panNumber}</p>
+                <p className="text-xs text-rose-600 mt-1.5">{formErrors.panNumber}</p>
               )}
             </div>
 
-            {/* Aadhaar Last 4 Only */}
+            {/* Aadhaar Last 4 Digits */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Aadhaar (Last 4 Digits Only) *
               </label>
               <input
@@ -320,37 +319,35 @@ export default function ApplicationForm() {
                 maxLength={4}
                 value={formData.aadhaarLast4}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 text-sm font-mono border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-slate-50/40"
+                placeholder="4 digits only"
+                className="w-full px-3.5 py-2.5 text-sm font-mono border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 bg-slate-50/40 text-slate-900"
               />
-              <span className="text-[10px] text-amber-700 mt-0.5 block font-mono">
-                Regulatory restriction: Enter ONLY the last 4 digits.
-              </span>
               {formErrors.aadhaarLast4 && (
-                <p className="text-[11px] text-rose-600 mt-1">{formErrors.aadhaarLast4}</p>
+                <p className="text-xs text-rose-600 mt-1.5">{formErrors.aadhaarLast4}</p>
               )}
             </div>
 
             {/* Mobile */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Mobile Number (+91) *
               </label>
               <input
-                type="text"
+                type="tel"
                 name="mobile"
                 maxLength={10}
                 value={formData.mobile}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 text-sm font-mono border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-slate-50/40"
+                className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 bg-slate-50/40 text-slate-900"
               />
               {formErrors.mobile && (
-                <p className="text-[11px] text-rose-600 mt-1">{formErrors.mobile}</p>
+                <p className="text-xs text-rose-600 mt-1.5">{formErrors.mobile}</p>
               )}
             </div>
 
             {/* Email */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Email Address *
               </label>
               <input
@@ -358,33 +355,33 @@ export default function ApplicationForm() {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-slate-50/40"
+                className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 bg-slate-50/40 text-slate-900"
               />
               {formErrors.email && (
-                <p className="text-[11px] text-rose-600 mt-1">{formErrors.email}</p>
+                <p className="text-xs text-rose-600 mt-1.5">{formErrors.email}</p>
               )}
             </div>
 
-            {/* Street Address */}
+            {/* Address */}
             <div className="sm:col-span-2">
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Residential Street Address *
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Residential Address *
               </label>
               <input
                 type="text"
                 name="address"
                 value={formData.address}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-slate-50/40"
+                className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 bg-slate-50/40 text-slate-900"
               />
               {formErrors.address && (
-                <p className="text-[11px] text-rose-600 mt-1">{formErrors.address}</p>
+                <p className="text-xs text-rose-600 mt-1.5">{formErrors.address}</p>
               )}
             </div>
 
             {/* City */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 City *
               </label>
               <input
@@ -392,13 +389,13 @@ export default function ApplicationForm() {
                 name="city"
                 value={formData.city}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-slate-50/40"
+                className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 bg-slate-50/40 text-slate-900"
               />
             </div>
 
             {/* State */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 State *
               </label>
               <input
@@ -406,14 +403,14 @@ export default function ApplicationForm() {
                 name="state"
                 value={formData.state}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-slate-50/40"
+                className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 bg-slate-50/40 text-slate-900"
               />
             </div>
 
             {/* PIN Code */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                PIN Code (6 Digits) *
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Postal PIN Code (6 Digits) *
               </label>
               <input
                 type="text"
@@ -421,23 +418,23 @@ export default function ApplicationForm() {
                 maxLength={6}
                 value={formData.pincode}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 text-sm font-mono border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-slate-50/40"
+                className="w-full px-3.5 py-2.5 text-sm font-mono border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 bg-slate-50/40 text-slate-900"
               />
               {formErrors.pincode && (
-                <p className="text-[11px] text-rose-600 mt-1">{formErrors.pincode}</p>
+                <p className="text-xs text-rose-600 mt-1.5">{formErrors.pincode}</p>
               )}
             </div>
 
             {/* Occupation */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Occupation *
               </label>
               <select
                 name="occupationCode"
                 value={formData.occupationCode}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 bg-white text-slate-900"
               >
                 {OCCUPATIONS.map((occ) => (
                   <option key={occ.code} value={occ.code}>
@@ -449,7 +446,7 @@ export default function ApplicationForm() {
 
             {/* Annual Income */}
             <div className="sm:col-span-2">
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Annual Income (INR) *
               </label>
               <input
@@ -457,39 +454,39 @@ export default function ApplicationForm() {
                 name="annualIncome"
                 value={formData.annualIncome}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 text-sm font-mono border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 bg-slate-50/40"
+                className="w-full px-3.5 py-2.5 text-sm font-mono border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 bg-slate-50/40 text-slate-900"
               />
             </div>
           </div>
 
           {/* Consent Checkbox */}
           <div className="pt-2">
-            <label className="flex items-start gap-2.5 p-3 rounded-lg bg-slate-50 border border-slate-200/80 cursor-pointer">
+            <label className="flex items-start gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 cursor-pointer">
               <input
                 type="checkbox"
                 name="consentKYC"
                 checked={formData.consentKYC}
                 onChange={handleInputChange}
-                className="mt-0.5 w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+                className="mt-0.5 w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
               />
-              <span className="text-xs text-slate-600 leading-relaxed font-sans">
+              <span className="text-xs text-slate-600 leading-relaxed">
                 I hereby grant consent to Deccan Digital Bank to process my submitted demographic and
                 identification records against regulatory KYC guidelines and watchlists.
               </span>
             </label>
             {formErrors.consentKYC && (
-              <p className="text-[11px] text-rose-600 mt-1">{formErrors.consentKYC}</p>
+              <p className="text-xs text-rose-600 mt-1.5">{formErrors.consentKYC}</p>
             )}
           </div>
 
-          <div className="flex justify-end pt-2">
+          <div className="flex justify-end pt-3 border-t border-slate-100">
             <button
               type="button"
               onClick={handleNextToDocs}
-              className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-mono font-semibold text-xs rounded-lg transition-colors flex items-center gap-2"
+              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
             >
-              <span>NEXT: SPECIMEN DOCUMENTS</span>
-              <ArrowRight className="w-3.5 h-3.5 text-blue-400" />
+              <span>Next: Specimen Documents</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -497,30 +494,32 @@ export default function ApplicationForm() {
 
       {/* STEP 2: SPECIMEN DOCUMENT UPLOAD */}
       {currentStep === 2 && (
-        <div className="bg-white rounded-xl border border-slate-200/90 p-6 shadow-xs space-y-5">
-          <div className="border-b border-slate-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 shadow-xs space-y-6">
+          <div className="border-b border-slate-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h3 className="text-sm font-bold text-slate-900">
+              <h2 className="text-base font-bold text-slate-900">
                 Upload Verification Specimens
-              </h3>
+              </h2>
               <p className="text-xs text-slate-500 mt-0.5">
                 Upload at least three UTF-8 .txt files representing OCR extracted identity documents.
               </p>
             </div>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 font-bold">
-              {uploadedFiles.length}/3 ATTACHED
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+              {uploadedFiles.length} of 3 Attached
             </span>
           </div>
 
-          {/* Fine Dashed Drop Zone */}
-          <label className="border border-dashed border-slate-300 hover:border-blue-500 rounded-xl p-8 flex flex-col items-center justify-center gap-2 cursor-pointer bg-slate-50/40 hover:bg-blue-50/20 transition-colors">
-            <Upload className="w-6 h-6 text-slate-400" />
-            <div className="text-center font-mono">
-              <span className="text-xs font-semibold text-slate-800 block">
-                SELECT OR DROP .TXT SPECIMEN FILES
+          {/* Dashed Drop Zone */}
+          <label className="border border-dashed border-slate-300 hover:border-blue-500 rounded-2xl p-8 flex flex-col items-center justify-center gap-2 cursor-pointer bg-slate-50/50 hover:bg-blue-50/20 transition-colors">
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shadow-xs">
+              <Upload className="w-6 h-6" />
+            </div>
+            <div className="text-center">
+              <span className="text-xs font-semibold text-slate-800 block mt-1">
+                Select or drop .txt specimen files
               </span>
-              <span className="text-[10px] text-slate-400 mt-0.5 block">
-                UTF-8 text • Max 1 MB each • Min 3 files required
+              <span className="text-[11px] text-slate-400 mt-0.5 block">
+                UTF-8 text · Max 1 MB each · At least 3 documents required
               </span>
             </div>
             <input
@@ -533,31 +532,33 @@ export default function ApplicationForm() {
           </label>
 
           {docUploadError && (
-            <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-lg text-xs text-rose-800 font-mono flex items-center gap-2">
-              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+            <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{docUploadError}</span>
             </div>
           )}
 
-          {/* Uploaded Documents Rows */}
-          <div className="space-y-2">
-            <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block">
-              ATTACHED DOCUMENTS ({uploadedFiles.length})
+          {/* Uploaded Documents List */}
+          <div className="space-y-3">
+            <span className="text-xs font-bold text-slate-900 uppercase tracking-wider block">
+              Attached Documents ({uploadedFiles.length})
             </span>
 
-            <div className="divide-y divide-slate-100 border border-slate-200 rounded-lg overflow-hidden font-mono text-xs">
+            <div className="divide-y divide-slate-100 border border-slate-200 rounded-2xl overflow-hidden text-xs">
               {uploadedFiles.map((doc) => (
                 <div
                   key={doc.id}
-                  className="p-3 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50 transition-colors"
+                  className="p-3.5 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50 transition-colors"
                 >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <FileText className="w-4 h-4 text-blue-600 shrink-0" />
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="p-2 rounded-lg bg-blue-50 text-blue-600 shrink-0">
+                      <FileText className="w-4 h-4" />
+                    </div>
                     <div className="min-w-0">
-                      <span className="font-bold text-slate-900 block truncate text-xs">
+                      <span className="font-semibold text-slate-900 block truncate">
                         {doc.name}
                       </span>
-                      <span className="text-[10px] text-slate-400">
+                      <span className="text-[11px] text-slate-400">
                         {formatFileSize(doc.size)}
                       </span>
                     </div>
@@ -567,32 +568,32 @@ export default function ApplicationForm() {
                     <select
                       value={doc.declaredType}
                       onChange={(e) => handleDeclaredTypeChange(doc.id, e.target.value)}
-                      className="text-xs px-2 py-1 border border-slate-200 rounded bg-white text-slate-800 focus:outline-none"
+                      className="text-xs px-2.5 py-1.5 border border-slate-200 rounded-lg bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                     >
-                      <option value={DOCUMENT_TYPES.PAN_CARD}>PAN_CARD</option>
-                      <option value={DOCUMENT_TYPES.AADHAAR_CARD}>AADHAAR_CARD</option>
-                      <option value={DOCUMENT_TYPES.ELECTRICITY_BILL}>ELECTRICITY_BILL</option>
-                      <option value={DOCUMENT_TYPES.BANK_STATEMENT}>BANK_STATEMENT</option>
-                      <option value={DOCUMENT_TYPES.DRIVING_LICENCE}>DRIVING_LICENCE</option>
-                      <option value={DOCUMENT_TYPES.OTHER}>OTHER</option>
+                      <option value={DOCUMENT_TYPES.PAN_CARD}>PAN Card</option>
+                      <option value={DOCUMENT_TYPES.AADHAAR_CARD}>Aadhaar Card</option>
+                      <option value={DOCUMENT_TYPES.ELECTRICITY_BILL}>Electricity Bill</option>
+                      <option value={DOCUMENT_TYPES.BANK_STATEMENT}>Bank Statement</option>
+                      <option value={DOCUMENT_TYPES.DRIVING_LICENCE}>Driving Licence</option>
+                      <option value={DOCUMENT_TYPES.OTHER}>Other Document</option>
                     </select>
 
                     <button
                       type="button"
                       onClick={() => setPreviewDoc(doc)}
-                      className="p-1 text-slate-400 hover:text-slate-800 rounded"
+                      className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"
                       title="Preview text"
                     >
-                      <Eye className="w-3.5 h-3.5" />
+                      <Eye className="w-4 h-4" />
                     </button>
 
                     <button
                       type="button"
                       onClick={() => handleRemoveDoc(doc.id)}
-                      className="p-1 text-slate-400 hover:text-rose-600 rounded"
+                      className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                       title="Remove file"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -600,24 +601,24 @@ export default function ApplicationForm() {
             </div>
           </div>
 
-          {/* Stepper Nav */}
-          <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+          {/* Stepper Navigation */}
+          <div className="flex items-center justify-between pt-4 border-t border-slate-100">
             <button
               type="button"
               onClick={() => setCurrentStep(1)}
-              className="px-3.5 py-2 text-slate-600 hover:bg-slate-100 rounded-lg text-xs font-mono flex items-center gap-1.5"
+              className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer"
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>BACK</span>
+              <ArrowLeft className="w-4 h-4" />
+              <span>Back</span>
             </button>
 
             <button
               type="button"
               onClick={handleNextToReview}
-              className="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-mono font-semibold text-xs rounded-lg transition-colors flex items-center gap-2"
+              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
             >
-              <span>NEXT: REVIEW &amp; SUBMIT</span>
-              <ArrowRight className="w-3.5 h-3.5 text-blue-400" />
+              <span>Next: Review &amp; Submit</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -625,107 +626,111 @@ export default function ApplicationForm() {
 
       {/* STEP 3: REVIEW & SUBMIT */}
       {currentStep === 3 && (
-        <div className="bg-white rounded-xl border border-slate-200/90 p-6 shadow-xs space-y-5">
-          <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
+        <div className="bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-8 shadow-xs space-y-6">
+          <div className="border-b border-slate-100 pb-4 flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-bold text-slate-900">
+              <h2 className="text-base font-bold text-slate-900">
                 Review &amp; Authorize Submission
-              </h3>
+              </h2>
               <p className="text-xs text-slate-500 mt-0.5">
                 Verify application details before submitting for automated screening.
               </p>
             </div>
-            <span className="text-[10px] font-mono text-slate-400 uppercase">
-              FINAL STEP
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+              Final Step
             </span>
           </div>
 
           {/* Details Grid */}
-          <div className="p-4 rounded-lg bg-slate-50/80 border border-slate-200/80 text-xs font-mono space-y-3">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="p-5 rounded-2xl bg-slate-50/80 border border-slate-200/80 text-xs space-y-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div>
-                <span className="text-slate-400 text-[9px] uppercase block font-sans">Full Name</span>
-                <span className="font-bold text-slate-900">{formData.fullName}</span>
+                <span className="text-slate-400 text-[10px] uppercase font-semibold block">Full Name</span>
+                <span className="font-bold text-slate-900 mt-0.5 block">{formData.fullName}</span>
               </div>
               <div>
-                <span className="text-slate-400 text-[9px] uppercase block font-sans">DOB</span>
-                <span>{formData.dob}</span>
+                <span className="text-slate-400 text-[10px] uppercase font-semibold block">Date of Birth</span>
+                <span className="font-medium text-slate-800 mt-0.5 block">{formData.dob}</span>
               </div>
               <div>
-                <span className="text-slate-400 text-[9px] uppercase block font-sans">Masked PAN</span>
-                <span className="font-bold text-blue-600">{maskPAN(formData.panNumber)}</span>
+                <span className="text-slate-400 text-[10px] uppercase font-semibold block">Masked PAN</span>
+                <span className="font-bold text-blue-600 font-mono mt-0.5 block">{maskPAN(formData.panNumber)}</span>
               </div>
               <div>
-                <span className="text-slate-400 text-[9px] uppercase block font-sans">Aadhaar Last 4</span>
-                <span className="font-bold">{maskAadhaar(formData.aadhaarLast4)}</span>
+                <span className="text-slate-400 text-[10px] uppercase font-semibold block">Aadhaar Last 4</span>
+                <span className="font-bold text-slate-800 font-mono mt-0.5 block">{maskAadhaar(formData.aadhaarLast4)}</span>
               </div>
             </div>
 
-            <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between">
+            <div className="pt-3 border-t border-slate-200/60 flex items-center justify-between">
               <span className="text-slate-600 truncate">
                 Address: {formData.address}, {formData.city}, {formData.state} - {formData.pincode}
               </span>
               <button
                 type="button"
                 onClick={() => setCurrentStep(1)}
-                className="text-[11px] text-blue-600 hover:underline font-bold"
+                className="text-xs text-blue-600 hover:underline font-semibold cursor-pointer"
               >
-                EDIT
+                Edit
               </button>
             </div>
           </div>
 
           {/* Attached Documents */}
-          <div className="space-y-1.5 font-mono text-xs">
+          <div className="space-y-2 text-xs">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                ATTACHED SPECIMEN DOCUMENTS ({uploadedFiles.length})
+              <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                Attached Specimen Documents ({uploadedFiles.length})
               </span>
               <button
                 type="button"
                 onClick={() => setCurrentStep(2)}
-                className="text-[11px] text-blue-600 hover:underline font-bold"
+                className="text-xs text-blue-600 hover:underline font-semibold cursor-pointer"
               >
-                EDIT
+                Edit
               </button>
             </div>
-            {uploadedFiles.map((doc) => (
-              <div
-                key={doc.id}
-                className="p-2.5 bg-slate-50 rounded-lg border border-slate-200/80 flex items-center justify-between"
-              >
-                <div className="flex items-center gap-2">
-                  <FileText className="w-3.5 h-3.5 text-blue-600" />
-                  <span className="font-semibold text-slate-800">{doc.name}</span>
+            <div className="space-y-1.5">
+              {uploadedFiles.map((doc) => (
+                <div
+                  key={doc.id}
+                  className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <FileText className="w-4 h-4 text-blue-600" />
+                    <span className="font-semibold text-slate-800">{doc.name}</span>
+                  </div>
+                  <span className="text-slate-500 font-medium">
+                    {DOCUMENT_TYPE_LABELS[doc.declaredType] || doc.declaredType}
+                  </span>
                 </div>
-                <span className="text-slate-500 text-[11px]">{doc.declaredType}</span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
-          {/* Submit */}
-          <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+          {/* Submit Actions */}
+          <div className="flex items-center justify-between pt-4 border-t border-slate-100">
             <button
               type="button"
               onClick={() => setCurrentStep(2)}
-              className="px-3.5 py-2 text-slate-600 hover:bg-slate-100 rounded-lg text-xs font-mono flex items-center gap-1.5"
+              className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer"
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>BACK</span>
+              <ArrowLeft className="w-4 h-4" />
+              <span>Back</span>
             </button>
 
             <button
               type="button"
               disabled={loading}
               onClick={handleSubmitApplication}
-              className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-mono font-bold text-xs rounded-lg transition-colors flex items-center gap-2 shadow-xs disabled:opacity-50"
+              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl transition-colors flex items-center gap-2 shadow-xs disabled:opacity-50 cursor-pointer"
             >
               {loading ? (
-                <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
                   <ShieldCheck className="w-4 h-4" />
-                  <span>SUBMIT APPLICATION</span>
+                  <span>Submit KYC Application</span>
                 </>
               )}
             </button>
@@ -735,20 +740,28 @@ export default function ApplicationForm() {
 
       {/* Preview Modal */}
       {previewDoc && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs font-mono">
-          <div className="bg-[#0b0f19] text-slate-200 rounded-xl max-w-xl w-full border border-[#1b253b] overflow-hidden shadow-2xl">
-            <div className="p-3 bg-[#070a12] border-b border-[#1b253b] flex items-center justify-between text-xs">
-              <span className="font-bold text-slate-300">{previewDoc.name}</span>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs font-sans">
+          <div className="bg-white text-slate-900 rounded-2xl max-w-xl w-full border border-slate-200 overflow-hidden shadow-2xl">
+            <div className="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between text-xs">
+              <span className="font-bold text-slate-900 text-sm">{previewDoc.name}</span>
               <button
                 onClick={() => setPreviewDoc(null)}
-                className="text-[11px] text-slate-400 hover:text-white"
+                className="p-1 text-slate-400 hover:text-slate-700 rounded-md transition-colors cursor-pointer"
               >
-                CLOSE
+                <X className="w-5 h-5" />
               </button>
             </div>
-            <pre className="p-4 text-xs font-mono max-h-80 overflow-y-auto whitespace-pre-wrap leading-relaxed select-text">
+            <pre className="p-5 text-xs font-mono max-h-80 overflow-y-auto whitespace-pre-wrap leading-relaxed select-text bg-slate-50/50 border-b border-slate-100 text-slate-800">
               {previewDoc.content}
             </pre>
+            <div className="p-3 bg-slate-50 text-right">
+              <button
+                onClick={() => setPreviewDoc(null)}
+                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold cursor-pointer"
+              >
+                Close Preview
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -8,11 +8,8 @@ import {
   FileText,
   AlertTriangle,
   History,
-  ShieldAlert,
   Send,
   Edit3,
-  Layers,
-  Clock,
 } from 'lucide-react';
 import { reviewApi } from '../../api/review';
 import { applicationsApi } from '../../api/applications';
@@ -22,7 +19,7 @@ import ConfirmDialog from '../../components/ConfirmDialog';
 import { LoadingSpinner } from '../../components/LoadingState';
 import { useToast } from '../../components/Toast';
 import { maskPAN, formatDateTime } from '../../utils/formatters';
-import { APPLICATION_STATUS, STATUS_LABELS, RISK_COLORS } from '../../constants/statuses';
+import { STATUS_LABELS, RISK_COLORS } from '../../constants/statuses';
 
 export default function ReviewWorkbench() {
   const { id } = useParams();
@@ -99,121 +96,102 @@ export default function ReviewWorkbench() {
 
     setCorrectionSubmitting(true);
     try {
-      const res = await reviewApi.correctExtractedField(application.applicationId, {
+      const res = await reviewApi.submitFieldCorrection(application.applicationId, {
         docId: selectedFieldToCorrect.docId,
-        fieldName: selectedFieldToCorrect.fieldName,
+        field: selectedFieldToCorrect.field,
         correctedValue,
-        reason: correctionReason,
+        correctionReason,
       });
 
       if (res.success) {
-        showToast(
-          `Field corrected to "${correctedValue}" (Confidence: 1.00, Source: OFFICER)`,
-          'success'
-        );
+        showToast(`Corrected ${selectedFieldToCorrect.fieldName}. Rules re-evaluated.`, 'success');
         setCorrectionModalOpen(false);
         loadReviewData();
       }
-    } catch (err) {
-      showToast(err.message || 'Correction failed', 'error');
+    } catch (e) {
+      showToast(e.message || 'Error updating field correction', 'error');
     } finally {
       setCorrectionSubmitting(false);
     }
   };
 
-  // Submit Officer Recommendation
+  // Submit Maker Recommendation (FR-7)
   const handleConfirmRecommendation = async () => {
-    if (!recommendationComment || recommendationComment.trim().length < 10) {
-      showToast('Mandatory officer comment must be at least 10 characters', 'error');
-      return;
-    }
-
     setRecommendationSubmitting(true);
     try {
-      const res = await reviewApi.submitOfficerRecommendation(application.applicationId, {
+      const res = await reviewApi.submitRecommendation(application.applicationId, {
         action: recommendationAction,
         comment: recommendationComment,
       });
 
       if (res.success) {
+        setConfirmModalOpen(false);
         showToast(
-          `Recommendation [${recommendationAction}] submitted. Case moved to ${res.data.status}.`,
+          `Recommendation submitted: ${recommendationAction}. Routed to Compliance Checker.`,
           'success'
         );
-        setConfirmModalOpen(false);
         navigate('/officer/queue');
       }
-    } catch (err) {
-      showToast(err.message || 'Submission failed', 'error');
+    } catch (e) {
+      showToast(e.message || 'Failed to submit recommendation', 'error');
     } finally {
       setRecommendationSubmitting(false);
     }
   };
 
-  if (loading) {
-    return <LoadingSpinner message="Opening review desk &amp; registering document view audit..." />;
+  if (loading || !application) {
+    return <LoadingSpinner message="Loading review desk telemetry..." />;
   }
-
-  if (!application) {
-    return null;
-  }
-
-  const activeDoc = documents.find((d) => d.docId === selectedDocId) || documents[0];
 
   return (
-    <div className="space-y-5">
-      {/* Workspace Operational Header */}
-      <div className="bg-white rounded-xl border border-slate-200/90 px-5 py-3.5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-5 font-sans">
+      {/* Top Header */}
+      <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/officer/queue')}
-            className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200"
-            title="Back to queue"
+            className="p-2 text-slate-500 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+            title="Back to Review Queue"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <div className="flex items-center gap-2">
-              <span className="font-mono font-bold text-base text-slate-900">
-                CASE {application.applicationId}
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-xl font-bold text-slate-900">
+                Case {application.applicationId}
+              </h1>
+              <span
+                className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
+                  RISK_COLORS[application.riskCategory] || 'bg-slate-100 text-slate-700'
+                }`}
+              >
+                {application.riskCategory} Risk
               </span>
-              <span className="text-slate-300">/</span>
-              <span className="font-semibold text-slate-800 text-sm">{application.fullName}</span>
-              <span className="text-xs font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200">
-                PAN: {maskPAN(application.panNumber)}
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-semibold border border-slate-200">
+                {STATUS_LABELS[application.status] || application.status}
               </span>
             </div>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Applicant: <strong className="text-slate-800 font-semibold">{application.fullName}</strong> · PAN:{' '}
+              <span className="font-mono text-slate-700 font-semibold">{maskPAN(application.panNumber)}</span> · Submitted:{' '}
+              {formatDateTime(application.applicationDate)}
+            </p>
           </div>
         </div>
 
-        {/* Current Status & Refresh */}
+        {/* Header Right Status */}
         <div className="flex items-center gap-2">
-          {application.riskCategory && (
-            <span
-              className={`text-[11px] font-mono font-bold px-2.5 py-1 rounded border ${
-                RISK_COLORS[application.riskCategory]
-              }`}
-            >
-              {application.riskCategory} RISK
-            </span>
-          )}
-          <span className="text-xs font-mono font-semibold text-slate-700 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded">
-            {STATUS_LABELS[application.status] || application.status}
+          <span className="text-xs font-medium text-slate-500">Dual Authorization:</span>
+          <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200">
+            Maker Preparation Desk
           </span>
-          <button
-            onClick={loadReviewData}
-            className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg border border-slate-200 text-xs transition-colors"
-            title="Reload case data"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-          </button>
         </div>
       </div>
 
-      {/* Split-Screen Review Workspace */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-        {/* Left Column: OCR Document Terminal (5 cols) */}
-        <div className="lg:col-span-5 h-[690px]">
+      {/* Split-Screen Review Workbench */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 min-h-[580px]">
+        {/* Left: OCR Raw Text & Document Viewer (5 cols) */}
+        <div className="lg:col-span-5 flex flex-col min-h-[520px]">
           <DocumentViewer
             documents={documents}
             selectedDocId={selectedDocId}
@@ -221,82 +199,76 @@ export default function ReviewWorkbench() {
           />
         </div>
 
-        {/* Right Column: Entity Inspector & Recommendation (7 cols) */}
-        <div className="lg:col-span-7 space-y-5">
+        {/* Right: Extracted Entities, Discrepancies, and Decision Panel (7 cols) */}
+        <div className="lg:col-span-7 flex flex-col space-y-4">
           <ExtractedFields
             application={application}
-            document={activeDoc}
+            document={documents.find((d) => d.docId === selectedDocId) || documents[0]}
             onOpenCorrectionModal={handleOpenCorrection}
             sanctionsMatch={sanctionsMatch}
             pepMatch={pepMatch}
           />
 
           {/* Maker Recommendation Desk */}
-          <div className="bg-white rounded-xl border border-slate-200/90 p-5 shadow-xs space-y-4">
-            <div className="border-b border-slate-100 pb-2.5 flex items-center justify-between">
-              <div>
-                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider font-mono">
-                  MAKER RECOMMENDATION DESK (FR-6)
-                </h3>
-                <p className="text-[11px] text-slate-500 mt-0.5">
-                  Recommendation will be submitted for dual-control Compliance Checker authorization.
-                </p>
-              </div>
-
-              <span className="text-[10px] font-mono font-bold text-purple-700 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded">
-                DUAL AUTHORIZATION
-              </span>
+          <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs space-y-4">
+            <div>
+              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                Maker Recommendation Desk
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Prepare your assessment. All recommendations are routed to a separate compliance checker for final authorization.
+              </p>
             </div>
 
-            {/* Recommendation Buttons */}
+            {/* Recommendation Choice Tabs */}
             <div className="grid grid-cols-3 gap-2.5">
               <button
                 type="button"
                 onClick={() => setRecommendationAction('APPROVE')}
-                className={`p-2.5 rounded-lg border text-xs font-mono font-semibold flex items-center justify-center gap-1.5 transition-all ${
+                className={`p-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
                   recommendationAction === 'APPROVE'
-                    ? 'bg-emerald-50 text-emerald-800 border-emerald-300 ring-1 ring-emerald-500/20'
+                    ? 'bg-emerald-50 text-emerald-800 border-emerald-300 ring-2 ring-emerald-500/20'
                     : 'text-slate-600 border-slate-200 hover:bg-slate-50'
                 }`}
               >
                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>APPROVE</span>
+                <span>Approve</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setRecommendationAction('REQUEST_RESUBMISSION')}
-                className={`p-2.5 rounded-lg border text-xs font-mono font-semibold flex items-center justify-center gap-1.5 transition-all ${
+                className={`p-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
                   recommendationAction === 'REQUEST_RESUBMISSION'
-                    ? 'bg-orange-50 text-orange-800 border-orange-300 ring-1 ring-orange-500/20'
+                    ? 'bg-amber-50 text-amber-800 border-amber-300 ring-2 ring-amber-500/20'
                     : 'text-slate-600 border-slate-200 hover:bg-slate-50'
                 }`}
               >
-                <RefreshCw className="w-4 h-4 text-orange-600" />
-                <span>RESUBMISSION</span>
+                <RefreshCw className="w-4 h-4 text-amber-600" />
+                <span>Resubmission</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setRecommendationAction('REJECT')}
-                className={`p-2.5 rounded-lg border text-xs font-mono font-semibold flex items-center justify-center gap-1.5 transition-all ${
+                className={`p-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
                   recommendationAction === 'REJECT'
-                    ? 'bg-rose-50 text-rose-800 border-rose-300 ring-1 ring-rose-500/20'
+                    ? 'bg-rose-50 text-rose-800 border-rose-300 ring-2 ring-rose-500/20'
                     : 'text-slate-600 border-slate-200 hover:bg-slate-50'
                 }`}
               >
                 <XCircle className="w-4 h-4 text-rose-600" />
-                <span>REJECT</span>
+                <span>Reject</span>
               </button>
             </div>
 
             {/* Mandatory Comment */}
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="text-[11px] font-mono font-semibold text-slate-700">
-                  MAKER COMMENTS (MIN 10 CHARS) *
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-semibold text-slate-700">
+                  Maker Comment (Min 10 characters) *
                 </label>
-                <span className="text-[10px] font-mono text-slate-400">
+                <span className="text-[11px] text-slate-400 tabular-nums">
                   {recommendationComment.length}/10 chars
                 </span>
               </div>
@@ -305,7 +277,7 @@ export default function ReviewWorkbench() {
                 value={recommendationComment}
                 onChange={(e) => setRecommendationComment(e.target.value)}
                 placeholder="State operational rationale for recommendation or specify requested replacement document..."
-                className="w-full p-2.5 text-xs font-mono border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-slate-50/50"
+                className="w-full p-3 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 bg-slate-50/50 text-slate-900"
               />
             </div>
 
@@ -320,10 +292,10 @@ export default function ReviewWorkbench() {
                   }
                   setConfirmModalOpen(true);
                 }}
-                className="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-mono font-semibold text-xs rounded-lg transition-colors flex items-center gap-2 shadow-xs"
+                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
               >
-                <Send className="w-3.5 h-3.5 text-blue-400" />
-                <span>SUBMIT RECOMMENDATION</span>
+                <Send className="w-4 h-4" />
+                <span>Submit Recommendation</span>
               </button>
             </div>
           </div>
@@ -331,38 +303,38 @@ export default function ReviewWorkbench() {
       </div>
 
       {/* Chronological Audit Log Table */}
-      <div className="bg-white rounded-xl border border-slate-200/90 p-5 shadow-xs space-y-3">
+      <div className="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-xs space-y-3.5">
         <div className="flex items-center justify-between">
-          <h3 className="text-xs font-bold font-mono text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-            <History className="w-3.5 h-3.5 text-blue-600" />
-            CASE AUDIT EVENT LOG (RULE FR-9)
+          <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+            <History className="w-4 h-4 text-blue-600" />
+            <span>Case Audit Event Log (Rule FR-9)</span>
           </h3>
-          <span className="text-[10px] font-mono text-slate-400">
-            {auditTrail.length} RECORDED EVENTS
+          <span className="text-xs text-slate-500 font-medium">
+            {auditTrail.length} recorded events
           </span>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs font-mono">
+          <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
-                <th className="py-2 px-3">TIMESTAMP</th>
-                <th className="py-2 px-3">ACTOR</th>
-                <th className="py-2 px-3">ROLE</th>
-                <th className="py-2 px-3">ACTION</th>
-                <th className="py-2 px-3 font-sans">DETAILS</th>
+              <tr className="bg-slate-50/80 text-[11px] font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-200/80">
+                <th className="py-2.5 px-3">Timestamp</th>
+                <th className="py-2.5 px-3">Actor</th>
+                <th className="py-2.5 px-3">Role</th>
+                <th className="py-2.5 px-3">Action</th>
+                <th className="py-2.5 px-3">Details</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-[11px]">
+            <tbody className="divide-y divide-slate-100 text-xs">
               {auditTrail.map((entry) => (
                 <tr key={entry.id} className="hover:bg-slate-50/70">
-                  <td className="py-2 px-3 text-slate-500 whitespace-nowrap">
+                  <td className="py-2.5 px-3 text-slate-500 whitespace-nowrap">
                     {formatDateTime(entry.timestamp)}
                   </td>
-                  <td className="py-2 px-3 font-semibold text-slate-800">{entry.actor}</td>
-                  <td className="py-2 px-3 text-slate-600">{entry.role}</td>
-                  <td className="py-2 px-3 font-semibold text-blue-600">{entry.action}</td>
-                  <td className="py-2 px-3 font-sans text-slate-600 max-w-md">{entry.details}</td>
+                  <td className="py-2.5 px-3 font-semibold text-slate-900">{entry.actor}</td>
+                  <td className="py-2.5 px-3 text-slate-600">{entry.role}</td>
+                  <td className="py-2.5 px-3 font-semibold text-blue-600">{entry.action}</td>
+                  <td className="py-2.5 px-3 text-slate-600 max-w-md">{entry.details}</td>
                 </tr>
               ))}
             </tbody>
@@ -372,44 +344,44 @@ export default function ReviewWorkbench() {
 
       {/* FIELD CORRECTION MODAL */}
       {correctionModalOpen && selectedFieldToCorrect && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
-          <div className="bg-white rounded-xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden font-mono">
-            <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden font-sans">
+            <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
               <div className="flex items-center gap-2">
                 <Edit3 className="w-4 h-4 text-blue-600" />
-                <h4 className="text-xs font-bold text-slate-900 uppercase">
-                  MANUAL FIELD CORRECTION // {selectedFieldToCorrect.fieldName}
+                <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wide">
+                  Manual Field Correction · {selectedFieldToCorrect.fieldName}
                 </h4>
               </div>
               <button
                 onClick={() => setCorrectionModalOpen(false)}
-                className="text-xs text-slate-400 hover:text-slate-700"
+                className="text-xs text-slate-400 hover:text-slate-700 font-semibold cursor-pointer"
               >
-                CANCEL
+                Cancel
               </button>
             </div>
 
-            <div className="p-5 space-y-3.5">
-              <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-lg text-[11px] text-amber-900 font-sans leading-relaxed">
+            <div className="p-5 space-y-4">
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 leading-relaxed">
                 Applying a correction updates field confidence to <strong>1.00</strong>, sets source to{' '}
-                <strong>OFFICER</strong>, records an audit event, and re-evaluates mock rules.
+                <strong>OFFICER</strong>, records an audit event, and re-evaluates compliance rules automatically.
               </div>
 
               {/* Before/Declared */}
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
-                  <span className="text-[9px] text-slate-400 uppercase block font-sans">
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
+                  <span className="text-[10px] text-slate-400 uppercase font-semibold block">
                     Declared
                   </span>
-                  <span className="font-bold text-slate-800 break-all">
+                  <span className="font-bold text-slate-800 break-all mt-0.5 block">
                     {selectedFieldToCorrect.declaredValue || 'N/A'}
                   </span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100">
-                  <span className="text-[9px] text-slate-400 uppercase block font-sans">
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
+                  <span className="text-[10px] text-slate-400 uppercase font-semibold block">
                     Extracted
                   </span>
-                  <span className="font-bold text-slate-800 break-all">
+                  <span className="font-bold text-slate-800 break-all mt-0.5 block">
                     {selectedFieldToCorrect.currentValue || 'N/A'}
                   </span>
                 </div>
@@ -417,50 +389,52 @@ export default function ReviewWorkbench() {
 
               {/* Corrected Input */}
               <div>
-                <label className="block text-[11px] text-slate-700 mb-1">
-                  CORRECTED VALUE *
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Corrected Value *
                 </label>
                 <input
                   type="text"
                   value={correctedValue}
                   onChange={(e) => setCorrectedValue(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3.5 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 text-slate-900"
                 />
               </div>
 
               {/* Reason */}
               <div>
-                <label className="block text-[11px] text-slate-700 mb-1">
-                  CORRECTION REASON (MIN 10 CHARS) *
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-semibold text-slate-700">
+                    Correction Reason (Min 10 chars) *
+                  </label>
+                  <span className="text-[11px] text-slate-400 tabular-nums">
+                    {correctionReason.length}/10 chars
+                  </span>
+                </div>
                 <textarea
                   rows={2}
                   value={correctionReason}
                   onChange={(e) => setCorrectionReason(e.target.value)}
-                  placeholder="State OCR scan correction basis..."
-                  className="w-full p-2.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  placeholder="State OCR scan correction justification..."
+                  className="w-full p-3 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 text-slate-900"
                 />
-                <span className="text-[10px] text-slate-400 mt-0.5 block">
-                  {correctionReason.length}/10 chars
-                </span>
               </div>
             </div>
 
-            <div className="p-3 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2 text-xs">
+            <div className="p-4 bg-slate-50/80 border-t border-slate-100 flex items-center justify-end gap-2.5 text-xs">
               <button
                 type="button"
                 onClick={() => setCorrectionModalOpen(false)}
-                className="px-3 py-1.5 text-slate-600 hover:bg-slate-200 rounded-lg"
+                className="px-4 py-2 text-slate-600 hover:bg-slate-200/70 rounded-xl font-medium cursor-pointer"
               >
-                CANCEL
+                Cancel
               </button>
               <button
                 type="button"
                 disabled={correctionSubmitting || correctionReason.trim().length < 10}
                 onClick={handleSubmitCorrection}
-                className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
+                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
               >
-                {correctionSubmitting ? 'APPLYING...' : 'APPLY CORRECTION'}
+                {correctionSubmitting ? 'Applying...' : 'Apply Correction'}
               </button>
             </div>
           </div>
@@ -478,7 +452,7 @@ export default function ReviewWorkbench() {
         onConfirm={handleConfirmRecommendation}
         onCancel={() => setConfirmModalOpen(false)}
       >
-        <div className="bg-slate-50 p-2.5 rounded-lg border text-xs font-mono text-slate-700">
+        <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs text-slate-700">
           <span className="font-semibold block text-slate-900 mb-1">Recorded Comment:</span>
           "{recommendationComment}"
         </div>

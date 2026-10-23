@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, FileText, CheckCircle2, AlertCircle, Eye, ShieldAlert } from 'lucide-react';
+import { Upload, FileText, CheckCircle2, AlertCircle, Eye, X } from 'lucide-react';
 import { DOCUMENT_TYPES, DOCUMENT_TYPE_LABELS } from '../../constants/statuses';
 import { applicationsApi } from '../../api/applications';
 import { validateDocumentFile } from '../../utils/validators';
@@ -67,20 +67,23 @@ export default function DocumentUpload() {
   };
 
   if (loading) {
-    return <LoadingSpinner message="Accessing submitted document feed..." />;
+    return <LoadingSpinner message="Accessing submitted document vault..." />;
   }
 
   return (
-    <div className="space-y-4 max-w-4xl mx-auto">
+    <div className="space-y-5 max-w-4xl mx-auto font-sans">
       {/* Header */}
-      <div className="bg-white rounded-xl border border-slate-200/90 px-5 py-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-base font-bold text-slate-900 font-mono">
-              DOCUMENT FEED // CASE {activeApp?.applicationId || 'A2000004'}
-            </h2>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 font-bold">
-              {documents.length} ATTACHED
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+              Document Vault
+            </h1>
+            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+              Case {activeApp?.applicationId || 'A2000004'}
+            </span>
+            <span className="text-xs text-slate-500 font-medium">
+              {documents.length} Files Attached
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
@@ -88,9 +91,9 @@ export default function DocumentUpload() {
           </p>
         </div>
 
-        <label className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-mono font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer shrink-0">
-          <Upload className="w-3.5 h-3.5 text-blue-400" />
-          <span>UPLOAD .TXT</span>
+        <label className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl transition-colors flex items-center gap-2 cursor-pointer shrink-0 shadow-xs">
+          <Upload className="w-4 h-4" />
+          <span>Upload Specimen .txt</span>
           <input
             type="file"
             multiple
@@ -102,53 +105,55 @@ export default function DocumentUpload() {
       </div>
 
       {/* Documents List */}
-      <div className="bg-white rounded-xl border border-slate-200/90 shadow-xs overflow-hidden">
-        <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-          <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider">
-            SUBMITTED SPECIMEN FILES ({documents.length})
+      <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+          <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+            Submitted Specimen Files ({documents.length})
           </span>
-          <span className="text-[10px] font-mono text-slate-400">ENCODING: UTF-8</span>
+          <span className="text-xs text-slate-400 font-medium">Encoding: UTF-8</span>
         </div>
 
         {documents.length === 0 ? (
-          <div className="p-8 text-center text-slate-400 text-xs font-mono">
-            NO SPECIMEN DOCUMENTS FOUND
+          <div className="p-12 text-center text-slate-400 text-xs">
+            No specimen documents found in vault
           </div>
         ) : (
-          <div className="divide-y divide-slate-100 font-mono text-xs">
+          <div className="divide-y divide-slate-100 text-xs">
             {documents.map((doc) => (
               <div
                 key={doc.docId}
-                className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50 transition-colors"
+                className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/80 transition-colors"
               >
-                <div className="flex items-center gap-3 min-w-0">
-                  <FileText className="w-4 h-4 text-blue-600 shrink-0" />
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600 shrink-0">
+                    <FileText className="w-5 h-5" />
+                  </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-slate-900 truncate">
+                      <span className="font-semibold text-slate-900 truncate">
                         {doc.fileName}
                       </span>
-                      <span className="text-[10px] text-slate-400">
+                      <span className="text-[11px] text-slate-400 font-mono">
                         [{doc.docId}]
                       </span>
                     </div>
-                    <span className="text-[10px] text-slate-500 block">
-                      {formatFileSize(doc.fileSize)} • {formatDateTime(doc.uploadedAt)}
+                    <span className="text-xs text-slate-500 block mt-0.5">
+                      {formatFileSize(doc.fileSize)} · Uploaded {formatDateTime(doc.uploadedAt)}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[11px] font-semibold">
+                <div className="flex items-center gap-2.5">
+                  <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-200">
                     {DOCUMENT_TYPE_LABELS[doc.declaredDocType] || doc.declaredDocType}
                   </span>
 
                   <button
                     onClick={() => setPreviewDoc(doc)}
-                    className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded transition-colors"
+                    className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-slate-200 cursor-pointer"
                     title="Inspect plain text"
                   >
-                    <Eye className="w-3.5 h-3.5" />
+                    <Eye className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -159,20 +164,28 @@ export default function DocumentUpload() {
 
       {/* Preview Modal */}
       {previewDoc && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs font-mono">
-          <div className="bg-[#0b0f19] text-slate-200 rounded-xl max-w-xl w-full border border-[#1b253b] overflow-hidden shadow-2xl">
-            <div className="p-3 bg-[#070a12] border-b border-[#1b253b] flex items-center justify-between text-xs">
-              <span className="font-bold text-slate-300">{previewDoc.fileName}</span>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs font-sans">
+          <div className="bg-white text-slate-900 rounded-2xl max-w-xl w-full border border-slate-200 overflow-hidden shadow-2xl">
+            <div className="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between text-xs">
+              <span className="font-bold text-slate-900 text-sm truncate">{previewDoc.fileName}</span>
               <button
                 onClick={() => setPreviewDoc(null)}
-                className="text-[11px] text-slate-400 hover:text-white"
+                className="p-1 text-slate-400 hover:text-slate-700 rounded-md transition-colors cursor-pointer"
               >
-                CLOSE
+                <X className="w-5 h-5" />
               </button>
             </div>
-            <pre className="p-4 text-xs font-mono max-h-80 overflow-y-auto whitespace-pre-wrap leading-relaxed select-text">
+            <pre className="p-5 text-xs font-mono max-h-96 overflow-y-auto whitespace-pre-wrap leading-relaxed select-text bg-slate-50/50 border-b border-slate-100 text-slate-800">
               {previewDoc.textContent}
             </pre>
+            <div className="p-3 bg-slate-50 text-right">
+              <button
+                onClick={() => setPreviewDoc(null)}
+                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold cursor-pointer"
+              >
+                Close Preview
+              </button>
+            </div>
           </div>
         </div>
       )}

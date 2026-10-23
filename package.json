@@ -1,0 +1,12 @@
+{
+  "name": "onboardiq-hackathon",
+  "private": true,
+  "version": "1.0.0",
+  "description": "OnboardIQ — Intelligent KYC Onboarding, Document Verification and Watchlist Screening with Maker-Checker",
+  "scripts": {
+    "dev": "npm --prefix client run dev",
+    "build": "npm --prefix client run build",
+    "preview": "npm --prefix client run preview",
+    "client": "npm --prefix client run dev"
+  }
+}

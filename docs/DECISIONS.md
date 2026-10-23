@@ -15,15 +15,23 @@ Rule: if you cannot explain an entry without looking at AI output, you do not ow
 
 ---
 
-## Example (delete before submission)
+## Logged Decisions
 
-### D-000: MongoDB over PostgreSQL
-- **Date / Owner:** Fri 10:30, Ravi
-- **Decision:** Use MongoDB with Mongoose.
-- **Alternatives considered:** PostgreSQL with Prisma, Firebase.
-- **Why:** Team already knows MERN, schema will change often during the hackathon, documents map naturally to our nested data.
-- **Tradeoff accepted:** Weaker relational integrity and joins; we enforce rules in the service layer.
-- **Revisit when:** Data becomes heavily relational or we need multi-row transactions at scale.
+### D-004: React 19 + Vite + Tailwind CSS for Enterprise Banking UI
+- **Date / Owner:** Hackathon Hour 1, Developer 1 (Frontend Architect)
+- **Decision:** Build the entire frontend in `client/` using React 19, Vite, Tailwind CSS v4, Lucide Icons, and Recharts.
+- **Alternatives considered:** Next.js (App Router), plain CSS, Material UI / Ant Design.
+- **Why:** Vite provides instant HMR and builds in ~1.2 seconds, allowing lightning-fast iteration during a 3-hour hackathon. Tailwind gives full control over clean digital banking aesthetics without heavy library baggage.
+- **Tradeoff accepted:** Client-side routing with React Router instead of SSR.
+- **Revisit when:** Production scale needs SEO or public marketing pages with SSR.
+
+### D-005: Clean Decoupled API Service Layer with Mock Store
+- **Date / Owner:** Hackathon Hour 1, Developer 1 (Frontend Architect)
+- **Decision:** Abstract all networking into `client/src/api/` (`applications.js`, `review.js`, `checker.js`, `notifications.js`) backed by an in-memory/sessionStorage mock database pre-populated with Case Study V1.0 worked examples (A2000001–A2000012).
+- **Alternatives considered:** Hardcoded static arrays inside JSX components, MSW (Mock Service Worker).
+- **Why:** Complete decoupling from backend development so Developer 2 can build Node/Express/MongoDB in parallel. Swapping to live HTTP endpoints only requires setting `VITE_API_BASE_URL` without altering page JSX.
+- **Tradeoff accepted:** Client-side demo state is persisted in browser storage rather than an authoritative database until Developer 2 connects backend services.
+- **Revisit when:** Backend REST API is deployed and environment variables are connected.
 
 ---
 
@@ -32,8 +40,8 @@ Rule: if you cannot explain an entry without looking at AI output, you do not ow
 - [ ] D-001: Database choice
 - [ ] D-002: Auth approach (JWT cookie vs session vs third-party)
 - [ ] D-003: API style (REST vs GraphQL)
-- [ ] D-004: Language (JavaScript vs TypeScript)
-- [ ] D-005: State management on client
+- [x] D-004: Language & Build (React 19 + Vite + Tailwind CSS)
+- [x] D-005: State management & API layer (Modular Service Layer + Mock Store)
 - [ ] D-006: Architecture (modular monolith vs services)
 - [ ] D-007: Deployment platform and why
 - [ ] D-008: Validation library

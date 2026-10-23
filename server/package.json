@@ -4,10 +4,14 @@
   "description": "OnboardIQ KYC Onboarding System - Backend",
   "main": "src/index.js",
   "scripts": {
-    "test": "vitest run",
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "node --test src/tests/unit/**/*.test.js",
+    "test:vitest": "vitest run",
     "test:watch": "vitest",
     "test:unit": "vitest run src/tests/unit",
-    "test:workflow": "vitest run src/tests/unit/workflow.test.js"
+    "test:workflow": "vitest run src/tests/unit/workflow.test.js",
+    "batch": "node scripts/processBatchCli.js"
   },
   "dependencies": {
     "express": "^4.18.2",

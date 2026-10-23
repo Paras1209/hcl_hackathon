@@ -1,11 +1,106 @@
-import { mockDb, delay } from './client';
+import { apiClient, mockDb, delay } from './client';
 import { APPLICATION_STATUS } from '../constants/statuses';
 
 export const checkerApi = {
   /**
-   * Retrieves pending checker queue
+   * Get pending checker queue from real backend
    */
   async getPendingCheckerQueue(filters = {}) {
+    try {
+      const params = new URLSearchParams();
+      Object.keys(filters).forEach((key) => {
+        if (filters[key] && filters[key] !== 'ALL') {
+          params.append(key, filters[key]);
+        }
+      });
+
+      const response = await apiClient.get('/checker/queue', { params });
+      return response;
+    } catch (error) {
+      console.warn('Failed to get checker queue from backend', error);
+      return await this.getPendingCheckerQueueMock(filters);
+    }
+  },
+
+  /**
+   * Get application for checker review
+   */
+  async getApplicationForChecker(applicationId) {
+    try {
+      const response = await apiClient.get(`/checker/${applicationId}`);
+      return response;
+    } catch (error) {
+      console.warn(`Failed to get checker application ${applicationId}`, error);
+      return await this.getApplicationForCheckerMock(applicationId);
+    }
+  },
+
+  /**
+   * Submit checker decision (with maker-checker validation)
+   */
+  async submitCheckerDecision(applicationId, { decision, comment }) {
+    try {
+      const response = await apiClient.post(`/checker/${applicationId}/decide`, {
+        decision,
+        comment,
+      });
+      return response;
+    } catch (error) {
+      // Check if it's a maker-checker violation
+      if (error.status === 403) {
+        const makerCheckerError = new Error(
+          'You cannot approve an application as both maker and checker. Different users are required for maker-checker compliance.'
+        );
+        makerCheckerError.code = 'MAKER_CHECKER_VIOLATION';
+        throw makerCheckerError;
+      }
+      throw error;
+    }
+  },
+
+  /**
+   * Get dashboard metrics
+   */
+  async getDashboardMetrics(dateFilter = 'ALL') {
+    try {
+      const response = await apiClient.get('/dashboard/stats', {
+        params: { dateFilter },
+      });
+      return response;
+    } catch (error) {
+      console.warn('Failed to get dashboard metrics from backend', error);
+      return await this.getDashboardMetricsMock(dateFilter);
+    }
+  },
+
+  /**
+   * Get top reason codes
+   */
+  async getTopReasons() {
+    try {
+      const response = await apiClient.get('/dashboard/top-reasons');
+      return response;
+    } catch (error) {
+      console.warn('Failed to get top reasons from backend', error);
+      return await this.getTopReasonsMock();
+    }
+  },
+
+  /**
+   * Get rules configuration
+   */
+  async getRuleConfigurations() {
+    try {
+      const response = await apiClient.get('/dashboard/metrics');
+      return response;
+    } catch (error) {
+      console.warn('Failed to get rules config', error);
+      return { success: true, data: {} };
+    }
+  },
+
+  // ===== FALLBACK MOCK METHODS =====
+  async getPendingCheckerQueueMock(filters = {}) {
     await delay(250);
     const apps = mockDb.getApplications();
     let pending = apps.filter((a) => a.status === APPLICATION_STATUS.PENDING_CHECKER);

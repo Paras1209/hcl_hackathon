@@ -1,12 +1,75 @@
-import { mockDb, delay } from './client';
+import { apiClient, mockDb, delay } from './client';
 import { APPLICATION_STATUS, RISK_CATEGORY } from '../constants/statuses';
 
 export const reviewApi = {
   /**
-   * Retrieves review queue for KYC Officers.
-   * Priority rule: HIGH risk first, then oldest submission first.
+   * Get review queue from real backend
    */
   async getReviewQueue(filters = {}) {
+    try {
+      const params = new URLSearchParams();
+      Object.keys(filters).forEach((key) => {
+        if (filters[key] && filters[key] !== 'ALL') {
+          params.append(key, filters[key]);
+        }
+      });
+
+      const response = await apiClient.get('/review/queue', { params });
+      return response;
+    } catch (error) {
+      console.warn('Failed to get review queue from backend', error);
+      return await this.getReviewQueueMock(filters);
+    }
+  },
+
+  /**
+   * Get application details for review
+   */
+  async getApplicationForReview(applicationId) {
+    try {
+      const response = await apiClient.get(`/review/${applicationId}`);
+      return response;
+    } catch (error) {
+      console.warn(`Failed to get review application ${applicationId}`, error);
+      return await this.getApplicationForReviewMock(applicationId);
+    }
+  },
+
+  /**
+   * Submit field correction
+   */
+  async correctField(applicationId, { fieldName, newValue, reason }) {
+    try {
+      const response = await apiClient.post(`/review/${applicationId}/correct-field`, {
+        fieldName,
+        newValue,
+        reason,
+      });
+      return response;
+    } catch (error) {
+      console.warn('Field correction failed', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Submit officer recommendation
+   */
+  async submitRecommendation(applicationId, { decision, comment }) {
+    try {
+      const response = await apiClient.post(`/review/${applicationId}/recommend`, {
+        decision,
+        comment,
+      });
+      return response;
+    } catch (error) {
+      console.warn('Recommendation submission failed', error);
+      throw error;
+    }
+  },
+
+  // ===== FALLBACK MOCK METHODS =====
+  async getReviewQueueMock(filters = {}) {
     await delay(250);
     let apps = mockDb.getApplications();
 

@@ -1,86 +1,136 @@
-import { mockDb, delay } from './client';
+import { apiClient, mockDb, delay } from './client';
 import { APPLICATION_STATUS, RISK_CATEGORY } from '../constants/statuses';
 
 export const applicationsApi = {
   /**
-   * Retrieves all applications with optional filtering
+   * Submit a new application with documents via real backend
    */
-  async getApplications(filters = {}) {
-    await delay(200);
-    let apps = mockDb.getApplications();
+  async createApplication(formData, uploadedFiles = []) {
+    try {
+      // Prepare multipart form data
+      const formDataObj = new FormData();
+      
+      // Add form fields
+      Object.keys(formData).forEach((key) => {
+        if (formData[key] !== undefined && formData[key] !== null) {
+          formDataObj.append(key, formData[key]);
+        }
+      });
+      
+      // Add files
+      uploadedFiles.forEach((file) => {
+        if (file.file instanceof File) {
+          formDataObj.append('documents', file.file, file.name);
+        }
+      });
 
-    if (filters.status && filters.status !== 'ALL') {
-      apps = apps.filter((a) => a.status === filters.status);
-    }
-    if (filters.riskCategory && filters.riskCategory !== 'ALL') {
-      apps = apps.filter((a) => a.riskCategory === filters.riskCategory);
-    }
-    if (filters.search) {
-      const q = filters.search.toLowerCase();
-      apps = apps.filter(
-        (a) =>
-          a.applicationId.toLowerCase().includes(q) ||
-          a.fullName.toLowerCase().includes(q) ||
-          a.panNumber.toLowerCase().includes(q)
-      );
-    }
+      const response = await apiClient.post('/applications', formDataObj, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
 
-    return { success: true, data: apps };
+      return response;
+    } catch (error) {
+      console.warn('Backend application creation failed, falling back to mock', error);
+      return await this.createApplicationMock(formData, uploadedFiles);
+    }
   },
 
   /**
-   * Retrieves a single application by ID with associated documents and audit history
+   * Get a specific application by ID
    */
   async getApplication(applicationId) {
-    await delay(250);
+    try {
+      const response = await apiClient.get(`/applications/${applicationId}`);
+      return response;
+    } catch (error) {
+      console.warn(`Failed to get application ${applicationId} from backend`, error);
+      return await this.getApplicationMock(applicationId);
+    }
+  },
+
+  /**
+   * Mock fallback for getApplication
+   */
+  async getApplicationMock(applicationId) {
+    await delay(200);
     const apps = mockDb.getApplications();
     const app = apps.find((a) => a.applicationId === applicationId);
+    
     if (!app) {
       throw new Error(`Application ${applicationId} not found`);
     }
 
-    const docs = mockDb.getDocuments().filter((d) => d.applicationId === applicationId);
-    const audit = mockDb.getAudit().filter((entry) => entry.applicationId === applicationId);
+    // Get associated documents
+    const docs = mockDb.getDocuments();
+    const applicationDocs = docs.filter((d) => d.applicationId === applicationId);
+    
+    // Get audit trail
+    const audit = mockDb.getAudit();
+    const applicationAudit = audit.filter((a) => a.applicationId === applicationId);
 
-    return {
-      success: true,
-      data: {
-        ...app,
-        documents: docs,
-        auditHistory: audit,
-      },
-    };
+    return { success: true, data: { ...app, documents: applicationDocs, auditHistory: applicationAudit } };
   },
 
   /**
-   * Retrieves current applicant's active applications
+   * Get all applications (for officer views)
+   */
+  async getApplications(filters = {}) {
+    try {
+      const params = new URLSearchParams();
+      Object.keys(filters).forEach((key) => {
+        if (filters[key] && filters[key] !== 'ALL') {
+          params.append(key, filters[key]);
+        }
+      });
+
+      const response = await apiClient.get('/applications', { params });
+      return response;
+    } catch (error) {
+      console.warn('Failed to get applications from backend', error);
+      return await this.getApplicationsMock(filters);
+    }
+  },
+
+  /**
+   * Get current applicant's applications
    */
   async getMyApplications() {
-    await delay(200);
-    const currentUser = mockDb.getCurrentUser();
-    const apps = mockDb.getApplications();
-
-    // In demo mode, if applicant has a linked applicationId, return that or match email
-    if (currentUser?.applicationId) {
-      return {
-        success: true,
-        data: apps.filter((a) => a.applicationId === currentUser.applicationId),
-      };
+    try {
+      const response = await apiClient.get('/applications?myApplications=true');
+      return response;
+    } catch (error) {
+      console.warn('Failed to get my applications from backend', error);
+      return await this.getMyApplicationsMock();
     }
-
-    const filtered = apps.filter(
-      (a) => a.email?.toLowerCase() === currentUser?.email?.toLowerCase()
-    );
-    return {
-      success: true,
-      data: filtered.length > 0 ? filtered : [apps[3]], // default to A2000004 for rich demo
-    };
   },
 
   /**
-   * Creates a new KYC application
+   * Resubmit documents for an application
    */
-  async createApplication(payload, uploadedFiles = []) {
+  async resubmitDocuments(applicationId, uploadedFiles = []) {
+    try {
+      const formDataObj = new FormData();
+      uploadedFiles.forEach((file) => {
+        if (file.file instanceof File) {
+          formDataObj.append('documents', file.file, file.name);
+        }
+      });
+
+      const response = await apiClient.post(
+        `/applications/${applicationId}/resubmit`,
+        formDataObj,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      );
+
+      return response;
+    } catch (error) {
+      console.warn('Backend resubmit failed', error);
+      throw error;
+    }
+  },
+
+  // ===== FALLBACK MOCK METHODS =====
+  async createApplicationMock(payload, uploadedFiles = []) {
     await delay(500);
 
     const apps = mockDb.getApplications();

@@ -16,8 +16,8 @@ const ExtractedFieldSchema = new mongoose.Schema(
     confidence: { type: Number, required: true, min: 0, max: 1 },
     source: {
       type: String,
-      enum: ['EXTRACTION', 'OFFICER'],
-      default: 'EXTRACTION',
+      enum: ['OCR', 'EXTRACTION', 'OFFICER'],
+      default: 'OCR',
     },
   },
   { _id: false }

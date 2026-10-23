@@ -12,13 +12,17 @@
     "test:watch": "vitest",
     "test:unit": "vitest run src/tests/unit",
     "test:workflow": "vitest run src/tests/unit/workflow.test.js",
+    "test:integration": "vitest run src/tests/integration",
+    "test:all": "npm run test:unit && npm run test:integration",
     "batch": "node scripts/processBatchCli.js"
   },
   "dependencies": {
+    "@aws-sdk/client-textract": "^3.1156.0",
+    "@aws-sdk/credential-providers": "^3.1156.0",
     "bcrypt": "^5.1.1",
     "cloudinary": "^1.40.0",
     "cookie-parser": "^1.4.7",
-    "cors": "^2.8.5",
+    "cors": "^2.8.6",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-async-errors": "^3.1.1",

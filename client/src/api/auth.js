@@ -1,11 +1,93 @@
-import { mockDb, delay } from './client';
+import { apiClient, mockDb, delay } from './client';
 import { DEMO_USERS, ROLES } from '../constants/roles';
 
 export const authApi = {
   /**
-   * Logs in a user. Supports applicant or officer journeys with automatic role assignment.
+   * Login with real backend
    */
-  async login({ email, password, journey, role }) {
+  async login({ email, password }) {
+    try {
+      const response = await apiClient.post('/auth/login', { email, password });
+      if (response.success) {
+        const user = response.data;
+        // Store token from backend
+        if (response.token) {
+          localStorage.setItem('onboardiq_auth_token', response.token);
+        }
+        mockDb.setCurrentUser(user);
+        return response;
+      }
+    } catch (error) {
+      // Fallback to mock for demo if backend unavailable
+      console.warn('Backend login failed, falling back to mock', error);
+      return await this.loginMock({ email, password });
+    }
+  },
+
+  /**
+   * Register with real backend
+   */
+  async register({ fullName, email, mobile, password, consentKYC }) {
+    try {
+      const response = await apiClient.post('/auth/register', {
+        fullName,
+        email,
+        mobile,
+        password,
+        consentKYC,
+      });
+      if (response.success) {
+        mockDb.setCurrentUser(response.data);
+        if (response.token) {
+          localStorage.setItem('onboardiq_auth_token', response.token);
+        }
+        return response;
+      }
+    } catch (error) {
+      // Fallback to mock
+      console.warn('Backend register failed, falling back to mock', error);
+      return await this.registerMock({ fullName, email, mobile, password, consentKYC });
+    }
+  },
+
+  /**
+   * Get current user from backend
+   */
+  async getCurrentUser() {
+    try {
+      const response = await apiClient.get('/auth/me');
+      if (response.success) {
+        mockDb.setCurrentUser(response.data);
+      }
+      return response;
+    } catch (error) {
+      // Fallback to mock
+      console.warn('Backend get user failed, using mock', error);
+      await delay(100);
+      const user = mockDb.getCurrentUser();
+      return { success: true, data: user };
+    }
+  },
+
+  /**
+   * Logout from backend
+   */
+  async logout() {
+    try {
+      const response = await apiClient.post('/auth/logout');
+      localStorage.removeItem('onboardiq_auth_token');
+      mockDb.setCurrentUser(null);
+      return response;
+    } catch (error) {
+      // Always cleanup local state
+      localStorage.removeItem('onboardiq_auth_token');
+      mockDb.setCurrentUser(null);
+      return { success: true };
+    }
+  },
+
+  // ===== FALLBACK MOCK METHODS =====
+  async loginMock({ email, password, journey, role }) {
     await delay(300);
 
     let user = null;
@@ -18,14 +100,12 @@ export const authApi = {
       email?.toLowerCase().includes('checker') ||
       email?.toLowerCase().includes('internal')
     ) {
-      // Backend automatically authenticates bank staff and assigns the appropriate staff profile
       if (email?.toLowerCase().includes('checker') || email?.toLowerCase().includes('suresh')) {
         user = DEMO_USERS.CHECKER;
       } else {
         user = DEMO_USERS.OFFICER;
       }
     } else {
-      // Customer applicant journey
       const formattedName = email
         ? email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
         : 'Ravi Kumar Sharma';
@@ -44,10 +124,7 @@ export const authApi = {
     return { success: true, data: user };
   },
 
-  /**
-   * Mock registration
-   */
-  async register({ fullName, email, mobile, password, consentKYC }) {
+  async registerMock({ fullName, email, mobile, password, consentKYC }) {
     await delay(400);
 
     if (!consentKYC) {
@@ -60,13 +137,12 @@ export const authApi = {
       email,
       mobile,
       role: ROLES.APPLICANT,
-      applicationId: null, // Will be set after form submission
+      applicationId: null,
     };
 
     mockDb.setCurrentUser(newUser);
     localStorage.setItem('onboardiq_auth_token', `mock_jwt_token_${newUser.id}`);
 
-    // Audit log
     mockDb.addAudit({
       actor: fullName,
       role: ROLES.APPLICANT,
@@ -75,34 +151,5 @@ export const authApi = {
     });
 
     return { success: true, data: newUser };
-  },
-
-  /**
-   * Gets current logged-in demo user
-   */
-  async getCurrentUser() {
-    await delay(100);
-    const user = mockDb.getCurrentUser();
-    return { success: true, data: user };
-  },
-
-  /**
-   * Demo role switcher
-   */
-  async switchRole(roleKey) {
-    await delay(150);
-    const user = DEMO_USERS[roleKey] || DEMO_USERS.OFFICER;
-    mockDb.setCurrentUser(user);
-    return { success: true, data: user };
-  },
-
-  /**
-   * Logout
-   */
-  async logout() {
-    await delay(100);
-    localStorage.removeItem('onboardiq_auth_token');
-    mockDb.setCurrentUser(null);
-    return { success: true };
   },
 };

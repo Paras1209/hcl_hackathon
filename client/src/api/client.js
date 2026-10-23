@@ -10,8 +10,8 @@ import {
 } from './mockData';
 import { DEMO_USERS } from '../constants/roles';
 
-// Configurable base URL with fallback
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
+// Configurable base URL with fallback to local backend
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,

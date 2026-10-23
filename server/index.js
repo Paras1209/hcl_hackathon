@@ -14,6 +14,9 @@ const logger = require('./src/utils/logger');
 // Routes
 const authRoutes = require('./src/routes/authRoutes');
 const documentRoutes = require('./src/routes/documentRoutes');
+const auditRoutes = require('./src/routes/auditRoutes');
+const applicationRoutes = require('./src/routes/applicationRoutes');
+const batchRoutes = require('./src/routes/batchRoutes');
 
 // Error handler (must be last)
 const { errorHandler } = require('./src/middleware/errorHandler');
@@ -76,21 +79,14 @@ app.get('/health', (req, res) => {
   });
 });
 
-// ── API Routes ───────────────────────────────────────────────────────────────
-app.use('/api/auth', authRoutes);
-app.use('/api/documents', documentRoutes);
-
-// Placeholder for routes owned by other developers
-// Dev 1 will add: app.use('/api/applications', applicationRoutes);
-// Dev 3 will add: app.use('/api/review', reviewRoutes);
-// Dev 3 will add: app.use('/api/checker', checkerRoutes);
-// Dev 3 will add: app.use('/api/dashboard', dashboardRoutes);
-// Dev 1 will add: app.use('/api/batch', batchRoutes);
-// Dev 2 will add: app.use('/api/audit', auditRoutes);
-
-// ── Audit routes (Dev 2 owned) ────────────────────────────────────────────────
-const auditRoutes = require('./src/routes/auditRoutes');
-app.use('/api/audit', auditRoutes);
+// ── API Routes (Supports both /api and /api/v1) ──────────────────────────────
+['/api', '/api/v1'].forEach((prefix) => {
+  app.use(`${prefix}/auth`, authRoutes);
+  app.use(`${prefix}/documents`, documentRoutes);
+  app.use(`${prefix}/audit`, auditRoutes);
+  app.use(`${prefix}/applications`, applicationRoutes);
+  app.use(`${prefix}/batch`, batchRoutes);
+});
 
 // ── 404 Handler ──────────────────────────────────────────────────────────────
 app.use((req, res) => {

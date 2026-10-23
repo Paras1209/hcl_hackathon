@@ -3,8 +3,29 @@
  * Tests pure logic components without database dependencies
  */
 
-// Note: Using commonjs require syntax as specified in CLAUDE.md
-const { describe, it, expect } = require('vitest');
+// Using node:test and node:assert for CommonJS test runner compatibility
+const { describe, it } = require('node:test');
+const assert = require('node:assert');
+
+const expect = (actual) => ({
+  toBe: (expected) => assert.strictEqual(actual, expected),
+  toEqual: (expected) => assert.deepStrictEqual(actual, expected),
+  toMatch: (regex) => assert.match(actual, regex),
+  toBeInstanceOf: (cls) => assert.ok(actual instanceof cls),
+  toThrow: (expectedError) => {
+    assert.throws(actual, (err) => {
+      if (!expectedError) return true;
+      if (typeof expectedError === 'string') return err.message.includes(expectedError);
+      if (expectedError.prototype instanceof Error || expectedError === Error) return err instanceof expectedError;
+      if (expectedError instanceof RegExp) return expectedError.test(err.message);
+      return true;
+    });
+  },
+  not: {
+    toBe: (expected) => assert.notStrictEqual(actual, expected),
+    toThrow: () => assert.doesNotThrow(actual)
+  }
+});
 
 // Import the modules we've created
 const { canTransition, isFinalStatus } = require('../../modules/workflow/statusMachine');

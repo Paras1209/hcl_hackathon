@@ -11,15 +11,15 @@ import {
   Cell,
 } from 'recharts';
 import {
-  LayoutDashboard as DashIcon,
-  Calendar as CalIcon,
+  RefreshCw as RefreshIcon,
+  Save as SaveIcon,
   CheckCircle2 as CheckIcon,
   AlertTriangle as AlertIcon,
   Sliders as SlidersIcon,
-  ShieldCheck as ShieldCheckIcon,
-  RefreshCw as RefreshIcon,
-  Save as SaveIcon,
-  Layers as LayersIcon,
+  Clock,
+  TrendingUp,
+  FileText,
+  Users,
 } from 'lucide-react';
 import { checkerApi } from '../../api/checker';
 import { STATUS_LABELS, STATUS_COLORS, APPLICATION_STATUS } from '../../constants/statuses';
@@ -107,58 +107,58 @@ export default function Dashboard() {
   }));
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5 font-sans">
       {/* Executive Command Header */}
-      <div className="bg-white rounded-xl border border-slate-200/90 px-5 py-4 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-base font-bold text-slate-900 tracking-tight font-mono">
-              COMPLIANCE DASHBOARD // FR-10 INTELLIGENCE
-            </h2>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200 font-bold">
-              AUDITED
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+              Compliance Dashboard
+            </h1>
+            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+              FR-10 Regulatory Intelligence
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Throughput, straight-through automation, dual-control volume &amp; compliance metrics.
+            Real-time compliance throughput, STP automation rates, dual-control backlogs &amp; exception metrics.
           </p>
         </div>
 
         {/* Tab & Date Selector Controls */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           {/* Segmented View Switcher */}
-          <div className="bg-slate-100 p-0.5 rounded-lg flex items-center text-xs font-mono">
+          <div className="bg-slate-100 p-1 rounded-xl flex items-center text-xs">
             <button
               onClick={() => setActiveTab('ANALYTICS')}
-              className={`px-3 py-1 rounded transition-colors ${
+              className={`px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
                 activeTab === 'ANALYTICS'
-                  ? 'bg-white text-slate-900 font-bold shadow-xs'
+                  ? 'bg-white text-slate-900 shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              METRICS &amp; QUEUES
+              Metrics &amp; Queues
             </button>
             <button
               onClick={() => setActiveTab('RULES_CONFIG')}
-              className={`px-3 py-1 rounded transition-colors ${
+              className={`px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
                 activeTab === 'RULES_CONFIG'
-                  ? 'bg-white text-slate-900 font-bold shadow-xs'
+                  ? 'bg-white text-slate-900 shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              RULES CONFIG
+              Rules Configuration
             </button>
           </div>
 
           {/* Date Segmented Control */}
-          <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg text-xs font-mono">
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs">
             {['ALL', 'TODAY', '7D', '30D'].map((range) => (
               <button
                 key={range}
                 onClick={() => setDateFilter(range)}
-                className={`px-2.5 py-1 rounded transition-colors ${
+                className={`px-2.5 py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
                   dateFilter === range
-                    ? 'bg-slate-900 text-white font-bold shadow-xs'
+                    ? 'bg-blue-600 text-white shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -169,123 +169,123 @@ export default function Dashboard() {
 
           <button
             onClick={loadDashboard}
-            className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg border border-slate-200 text-xs transition-colors"
+            className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl border border-slate-200 text-xs transition-colors cursor-pointer"
             title="Refresh metrics"
           >
-            <RefreshIcon className="w-3.5 h-3.5" />
+            <RefreshIcon className="w-4 h-4" />
           </button>
         </div>
       </div>
 
       {activeTab === 'ANALYTICS' ? (
         <>
-          {/* EXACT FR-10 KPI METRIC TILES (Institutional Terminal Design) */}
-          <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
+          {/* EXACT FR-10 KPI METRIC TILES */}
+          <div className="grid grid-cols-2 lg:grid-cols-6 gap-3.5">
             {/* 1. Straight-Through Rate */}
-            <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs">
-              <span className="text-[10px] text-slate-400 font-mono font-bold tracking-wider uppercase block">
-                STRAIGHT-THROUGH RATE
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">
+              <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider block">
+                Straight-Through Rate
               </span>
-              <div className="mt-2 flex items-baseline gap-1.5">
-                <span className="text-2xl font-black text-emerald-600 font-mono tabular-nums">
+              <div className="mt-2 flex items-baseline gap-1">
+                <span className="text-2xl font-bold text-emerald-600 tabular-nums">
                   {metrics.straightThroughRate}%
                 </span>
               </div>
-              <p className="text-[10px] text-slate-500 mt-1.5 font-mono">
-                AUTO_APPROVED ÷ Decided
+              <p className="text-[11px] text-slate-500 mt-1">
+                Auto-Approved ÷ Decided
               </p>
             </div>
 
             {/* 2. Manual Review Rate */}
-            <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs">
-              <span className="text-[10px] text-slate-400 font-mono font-bold tracking-wider uppercase block">
-                REVIEW RATE
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">
+              <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider block">
+                Review Rate
               </span>
-              <div className="mt-2 flex items-baseline gap-1.5">
-                <span className="text-2xl font-black text-amber-600 font-mono tabular-nums">
+              <div className="mt-2 flex items-baseline gap-1">
+                <span className="text-2xl font-bold text-amber-600 tabular-nums">
                   {metrics.reviewRate}%
                 </span>
               </div>
-              <p className="text-[10px] text-slate-500 mt-1.5 font-mono">
+              <p className="text-[11px] text-slate-500 mt-1">
                 Target: 30%–40% manual
               </p>
             </div>
 
             {/* 3. Reject Rate */}
-            <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs">
-              <span className="text-[10px] text-slate-400 font-mono font-bold tracking-wider uppercase block">
-                REJECT RATE
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">
+              <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider block">
+                Rejection Rate
               </span>
-              <div className="mt-2 flex items-baseline gap-1.5">
-                <span className="text-2xl font-black text-rose-600 font-mono tabular-nums">
+              <div className="mt-2 flex items-baseline gap-1">
+                <span className="text-2xl font-bold text-rose-600 tabular-nums">
                   {metrics.rejectRate}%
                 </span>
               </div>
-              <p className="text-[10px] text-slate-500 mt-1.5 font-mono">
-                Failed rules R4–R10
+              <p className="text-[11px] text-slate-500 mt-1">
+                Rules R4–R10 adverse
               </p>
             </div>
 
             {/* 4. Pending Checker Items */}
-            <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs">
-              <span className="text-[10px] text-slate-400 font-mono font-bold tracking-wider uppercase block">
-                PENDING CHECKER
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">
+              <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider block">
+                Pending Checker
               </span>
               <div className="mt-2 flex items-baseline gap-1.5">
-                <span className="text-2xl font-black text-purple-600 font-mono tabular-nums">
+                <span className="text-2xl font-bold text-blue-600 tabular-nums">
                   {metrics.pendingCheckerCount}
                 </span>
-                <span className="text-[10px] font-mono text-slate-400">cases</span>
+                <span className="text-xs text-slate-400 font-medium">cases</span>
               </div>
-              <p className="text-[10px] text-slate-500 mt-1.5 font-mono">
-                Awaiting authorization
+              <p className="text-[11px] text-slate-500 mt-1">
+                Awaiting sign-off
               </p>
             </div>
 
             {/* 5. Average Time in Review */}
-            <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs">
-              <span className="text-[10px] text-slate-400 font-mono font-bold tracking-wider uppercase block">
-                AVG TIME IN REVIEW
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">
+              <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider block">
+                Review TAT (Avg)
               </span>
               <div className="mt-2 flex items-baseline gap-1.5">
-                <span className="text-2xl font-black text-slate-900 font-mono tabular-nums">
+                <span className="text-2xl font-bold text-slate-900 tabular-nums">
                   {metrics.avgTimeInReviewHours}h
                 </span>
-                <span className="text-[10px] font-mono text-slate-400">SLA: 24h</span>
+                <span className="text-[11px] text-slate-400">SLA: 24h</span>
               </div>
-              <p className="text-[10px] text-slate-500 mt-1.5 font-mono">
+              <p className="text-[11px] text-slate-500 mt-1">
                 Baseline: 3 days
               </p>
             </div>
 
             {/* 6. Total Decided */}
-            <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-xs">
-              <span className="text-[10px] text-slate-400 font-mono font-bold tracking-wider uppercase block">
-                TOTAL DECIDED
+            <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">
+              <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider block">
+                Total Decided
               </span>
               <div className="mt-2 flex items-baseline gap-1.5">
-                <span className="text-2xl font-black text-blue-600 font-mono tabular-nums">
+                <span className="text-2xl font-bold text-slate-900 tabular-nums">
                   {metrics.totalDecided}
                 </span>
-                <span className="text-[10px] font-mono text-slate-400">/ {metrics.totalApplications}</span>
+                <span className="text-xs text-slate-400 font-medium">/ {metrics.totalApplications}</span>
               </div>
-              <p className="text-[10px] text-slate-500 mt-1.5 font-mono">
-                Decided in window
+              <p className="text-[11px] text-slate-500 mt-1">
+                Within selected window
               </p>
             </div>
           </div>
 
           {/* Charts Row: Status Distribution & Top 5 Reason Codes */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
             {/* Left: Status Distribution Donut */}
-            <div className="lg:col-span-5 bg-white rounded-xl border border-slate-200/90 p-5 shadow-xs flex flex-col justify-between">
+            <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200/90 p-6 shadow-xs flex flex-col justify-between">
               <div>
-                <span className="text-[10px] text-slate-400 font-mono font-bold tracking-wider uppercase block">
-                  LIFECYCLE STATUS DISTRIBUTION
+                <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider block">
+                  Status Distribution
                 </span>
-                <p className="text-xs text-slate-500 mt-0.5 font-mono">
-                  Active volume across the 10 lifecycle stages
-                </p>
+                <h3 className="text-sm font-bold text-slate-900 mt-0.5">
+                  Lifecycle Volume Allocation
+                </h3>
               </div>
 
               <div className="h-60 my-2">
@@ -311,12 +311,13 @@ export default function Dashboard() {
                     <Tooltip
                       formatter={(val, name) => [`${val} cases`, name]}
                       contentStyle={{
-                        backgroundColor: '#0b0f19',
-                        color: '#f8fafc',
-                        border: '1px solid #1e293b',
-                        borderRadius: '8px',
-                        fontFamily: 'monospace',
-                        fontSize: '11px',
+                        backgroundColor: '#ffffff',
+                        color: '#17243a',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '12px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                        fontSize: '12px',
+                        fontFamily: 'sans-serif',
                       }}
                     />
                   </PieChart>
@@ -324,31 +325,31 @@ export default function Dashboard() {
               </div>
 
               {/* Status Chips */}
-              <div className="grid grid-cols-2 gap-1.5 text-[10px] font-mono pt-3 border-t border-slate-100">
+              <div className="grid grid-cols-2 gap-1.5 text-xs pt-3.5 border-t border-slate-100">
                 {statusChartData.slice(0, 6).map((item) => (
-                  <div key={item.code} className="flex items-center justify-between p-1 rounded bg-slate-50">
-                    <div className="flex items-center gap-1.5 truncate">
+                  <div key={item.code} className="flex items-center justify-between p-1.5 rounded-lg bg-slate-50">
+                    <div className="flex items-center gap-2 truncate">
                       <span
-                        className="w-2 h-2 rounded-full shrink-0"
+                        className="w-2.5 h-2.5 rounded-full shrink-0"
                         style={{ backgroundColor: STATUS_CHART_COLORS[item.code] || '#94a3b8' }}
                       />
-                      <span className="truncate text-slate-600">{item.name}</span>
+                      <span className="truncate text-slate-700 font-medium">{item.name}</span>
                     </div>
-                    <span className="font-bold text-slate-900 ml-1.5">{item.count}</span>
+                    <span className="font-bold text-slate-900 ml-1.5 tabular-nums">{item.count}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Right: Top 5 Reason Codes */}
-            <div className="lg:col-span-7 bg-white rounded-xl border border-slate-200/90 p-5 shadow-xs flex flex-col justify-between">
+            <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200/90 p-6 shadow-xs flex flex-col justify-between">
               <div>
-                <span className="text-[10px] text-slate-400 font-mono font-bold tracking-wider uppercase block">
-                  TOP 5 TRIGGERED REASON CODES (FR-10)
+                <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider block">
+                  Top 5 Adverse Reason Codes (FR-10)
                 </span>
-                <p className="text-xs text-slate-500 mt-0.5 font-mono">
-                  Ranked by frequency from filtered sample dataset
-                </p>
+                <h3 className="text-sm font-bold text-slate-900 mt-0.5">
+                  Exceptions Ranked by Frequency
+                </h3>
               </div>
 
               <div className="h-64 my-2">
@@ -356,88 +357,89 @@ export default function Dashboard() {
                   <BarChart
                     data={reasonChartData}
                     layout="vertical"
-                    margin={{ top: 10, right: 20, left: 150, bottom: 5 }}
+                    margin={{ top: 10, right: 20, left: 160, bottom: 5 }}
                   >
-                    <XAxis type="number" allowDecimals={false} fontSize={10} stroke="#94a3b8" />
+                    <XAxis type="number" allowDecimals={false} fontSize={11} stroke="#94a3b8" />
                     <YAxis
                       dataKey="name"
                       type="category"
-                      fontSize={10}
+                      fontSize={11}
                       stroke="#475569"
-                      width={145}
+                      width={155}
                       tickLine={false}
                     />
                     <Tooltip
                       formatter={(val) => [`${val} occurrences`, 'Frequency']}
                       contentStyle={{
-                        backgroundColor: '#0b0f19',
-                        color: '#f8fafc',
-                        border: '1px solid #1e293b',
-                        borderRadius: '8px',
-                        fontFamily: 'monospace',
-                        fontSize: '11px',
+                        backgroundColor: '#ffffff',
+                        color: '#17243a',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '12px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                        fontSize: '12px',
+                        fontFamily: 'sans-serif',
                       }}
                     />
-                    <Bar dataKey="frequency" fill="#2563eb" radius={[0, 4, 4, 0]} />
+                    <Bar dataKey="frequency" fill="#2563eb" radius={[0, 6, 6, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
 
-              <div className="px-3 py-2 bg-slate-50 rounded-lg text-[10px] font-mono text-slate-500 flex items-center justify-between border border-slate-100">
-                <span>Evaluated across {metrics.filteredApplications?.length || 0} applications</span>
-                <span className="font-bold text-slate-700">RULES R1–R17 ENGINE</span>
+              <div className="px-4 py-2.5 bg-slate-50 rounded-xl text-xs text-slate-500 flex items-center justify-between border border-slate-100">
+                <span>Evaluated across {metrics.filteredApplications?.length || 0} applications in window</span>
+                <span className="font-semibold text-slate-800">Rules Engine R1–R17</span>
               </div>
             </div>
           </div>
 
           {/* Dataset Table */}
-          <div className="bg-white rounded-xl border border-slate-200/90 p-5 shadow-xs space-y-3">
+          <div className="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold font-mono text-slate-800 uppercase tracking-wider">
-                FILTERED APPLICATIONS DATASET ({metrics.filteredApplications?.length || 0})
+              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                Filtered Applications Dataset ({metrics.filteredApplications?.length || 0})
               </h3>
-              <span className="text-[10px] font-mono text-slate-400">
-                DATE SCOPE: {dateFilter}
+              <span className="text-xs text-slate-400 font-medium">
+                Scope: {dateFilter}
               </span>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs font-mono">
+              <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
-                    <th className="py-2.5 px-3">CASE ID</th>
-                    <th className="py-2.5 px-3 font-sans">APPLICANT</th>
-                    <th className="py-2.5 px-3">STATUS</th>
-                    <th className="py-2.5 px-3">RISK</th>
-                    <th className="py-2.5 px-3">TRIGGERED REASONS</th>
-                    <th className="py-2.5 px-3">DATE</th>
+                  <tr className="bg-slate-50/80 text-[11px] font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-200/80">
+                    <th className="py-2.5 px-3">Case ID</th>
+                    <th className="py-2.5 px-3">Applicant</th>
+                    <th className="py-2.5 px-3">Status</th>
+                    <th className="py-2.5 px-3">Risk</th>
+                    <th className="py-2.5 px-3">Triggered Reasons</th>
+                    <th className="py-2.5 px-3">Submission Date</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-[11px]">
+                <tbody className="divide-y divide-slate-100">
                   {metrics.filteredApplications?.slice(0, 7).map((app) => (
                     <tr key={app.applicationId} className="hover:bg-slate-50/70">
-                      <td className="py-2 px-3 font-bold text-blue-600">
+                      <td className="py-2.5 px-3 font-bold text-blue-600 font-mono">
                         {app.applicationId}
                       </td>
-                      <td className="py-2 px-3 font-sans font-semibold text-slate-900">
+                      <td className="py-2.5 px-3 font-semibold text-slate-900">
                         {app.fullName}
                       </td>
-                      <td className="py-2 px-3">
+                      <td className="py-2.5 px-3">
                         <span
-                          className={`px-1.5 py-0.2 rounded text-[10px] font-semibold border ${
+                          className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${
                             STATUS_COLORS[app.status]
                           }`}
                         >
-                          {app.status}
+                          {STATUS_LABELS[app.status] || app.status}
                         </span>
                       </td>
-                      <td className="py-2 px-3 font-bold text-slate-700">
+                      <td className="py-2.5 px-3 font-semibold text-slate-700">
                         {app.riskCategory || '—'}
                       </td>
-                      <td className="py-2 px-3 text-slate-500">
-                        {app.reasonCodes?.join(', ') || 'NONE'}
+                      <td className="py-2.5 px-3 text-slate-500">
+                        {app.reasonCodes?.join(', ') || 'None'}
                       </td>
-                      <td className="py-2 px-3 text-slate-400 whitespace-nowrap">
+                      <td className="py-2.5 px-3 text-slate-400 whitespace-nowrap">
                         {formatDate(app.applicationDate)}
                       </td>
                     </tr>
@@ -449,13 +451,13 @@ export default function Dashboard() {
         </>
       ) : (
         /* RULES & WATCHLISTS CONFIGURATION CONSOLE */
-        <div className="bg-white rounded-xl border border-slate-200/90 p-5 shadow-xs space-y-5 font-mono">
-          <div className="border-b border-slate-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-xs space-y-6">
+          <div className="border-b border-slate-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                COMPLIANCE PARAMETERS &amp; WATCHLIST THRESHOLDS
-              </h3>
-              <p className="text-[11px] text-slate-500 mt-0.5 font-sans">
+              <h2 className="text-base font-bold text-slate-900 tracking-tight">
+                Compliance Parameters &amp; Watchlist Thresholds
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">
                 Runtime configuration for rules R1 to R17 as specified in Case Study Section 6.1.
               </p>
             </div>
@@ -463,19 +465,19 @@ export default function Dashboard() {
             <button
               onClick={handleSaveRules}
               disabled={savingRules}
-              className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs rounded-lg transition-colors flex items-center gap-1.5 disabled:opacity-50"
+              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl transition-colors flex items-center gap-2 disabled:opacity-50 shadow-xs cursor-pointer"
             >
-              <SaveIcon className="w-3.5 h-3.5 text-blue-400" />
-              <span>{savingRules ? 'SAVING...' : 'SAVE CONFIGURATION'}</span>
+              <SaveIcon className="w-4 h-4" />
+              <span>{savingRules ? 'Saving...' : 'Save Configuration'}</span>
             </button>
           </div>
 
           {rulesConfig && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 text-xs">
               {/* Extraction Confidence */}
-              <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200 space-y-1.5">
-                <label className="text-[10px] text-slate-500 uppercase block font-bold">
-                  MIN USABLE FIELD CONFIDENCE
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+                <label className="text-xs text-slate-700 font-semibold block">
+                  Min Usable Field Confidence
                 </label>
                 <input
                   type="number"
@@ -486,17 +488,17 @@ export default function Dashboard() {
                   onChange={(e) =>
                     setRulesConfig({ ...rulesConfig, minFieldConfidence: parseFloat(e.target.value) })
                   }
-                  className="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-200 rounded bg-white"
+                  className="w-full px-3 py-2 text-xs font-mono border border-slate-200 rounded-lg bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 />
-                <span className="text-[10px] text-slate-400 block font-sans">
+                <span className="text-[11px] text-slate-400 block">
                   Default: 0.80. Below this triggers R3 LOW_EXTRACTION_CONFIDENCE.
                 </span>
               </div>
 
               {/* Name Match Pass */}
-              <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200 space-y-1.5">
-                <label className="text-[10px] text-slate-500 uppercase block font-bold">
-                  NAME MATCH PASS THRESHOLD
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+                <label className="text-xs text-slate-700 font-semibold block">
+                  Name Match Pass Threshold
                 </label>
                 <input
                   type="number"
@@ -510,17 +512,17 @@ export default function Dashboard() {
                       nameMatchPassThreshold: parseFloat(e.target.value),
                     })
                   }
-                  className="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-200 rounded bg-white"
+                  className="w-full px-3 py-2 text-xs font-mono border border-slate-200 rounded-lg bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 />
-                <span className="text-[10px] text-slate-400 block font-sans">
+                <span className="text-[11px] text-slate-400 block">
                   Default: 0.90. Above this is auto-pass without review.
                 </span>
               </div>
 
               {/* Name Match Reject */}
-              <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200 space-y-1.5">
-                <label className="text-[10px] text-slate-500 uppercase block font-bold">
-                  NAME MATCH REJECT THRESHOLD
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+                <label className="text-xs text-slate-700 font-semibold block">
+                  Name Match Reject Threshold
                 </label>
                 <input
                   type="number"
@@ -534,17 +536,17 @@ export default function Dashboard() {
                       nameMatchRejectThreshold: parseFloat(e.target.value),
                     })
                   }
-                  className="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-200 rounded bg-white"
+                  className="w-full px-3 py-2 text-xs font-mono border border-slate-200 rounded-lg bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 />
-                <span className="text-[10px] text-slate-400 block font-sans">
+                <span className="text-[11px] text-slate-400 block">
                   Default: 0.75. Below this triggers R9 NAME_MISMATCH (REJECT).
                 </span>
               </div>
 
               {/* Watchlist Match Threshold */}
-              <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200 space-y-1.5">
-                <label className="text-[10px] text-slate-500 uppercase block font-bold">
-                  WATCHLIST MATCH THRESHOLD
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+                <label className="text-xs text-slate-700 font-semibold block">
+                  Watchlist Match Threshold
                 </label>
                 <input
                   type="number"
@@ -556,17 +558,17 @@ export default function Dashboard() {
                       watchlistMatchThreshold: parseFloat(e.target.value),
                     })
                   }
-                  className="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-200 rounded bg-white"
+                  className="w-full px-3 py-2 text-xs font-mono border border-slate-200 rounded-lg bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 />
-                <span className="text-[10px] text-slate-400 block font-sans">
+                <span className="text-[11px] text-slate-400 block">
                   Default: 0.90. Similarity &ge; 0.90 triggers R10 SANCTIONS_MATCH.
                 </span>
               </div>
 
               {/* Address Proof Max Age */}
-              <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200 space-y-1.5">
-                <label className="text-[10px] text-slate-500 uppercase block font-bold">
-                  ADDRESS PROOF MAX AGE (DAYS)
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+                <label className="text-xs text-slate-700 font-semibold block">
+                  Address Proof Max Age (Days)
                 </label>
                 <input
                   type="number"
@@ -577,17 +579,17 @@ export default function Dashboard() {
                       addressProofMaxAgeDays: parseInt(e.target.value, 10),
                     })
                   }
-                  className="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-200 rounded bg-white"
+                  className="w-full px-3 py-2 text-xs font-mono border border-slate-200 rounded-lg bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 />
-                <span className="text-[10px] text-slate-400 block font-sans">
+                <span className="text-[11px] text-slate-400 block">
                   Default: 90 days. Utility bills older trigger R13.
                 </span>
               </div>
 
               {/* Resubmission Window Days */}
-              <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200 space-y-1.5">
-                <label className="text-[10px] text-slate-500 uppercase block font-bold">
-                  RESUBMISSION SLA WINDOW (DAYS)
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+                <label className="text-xs text-slate-700 font-semibold block">
+                  Resubmission SLA Window (Days)
                 </label>
                 <input
                   type="number"
@@ -598,9 +600,9 @@ export default function Dashboard() {
                       resubmissionWindowDays: parseInt(e.target.value, 10),
                     })
                   }
-                  className="w-full px-2.5 py-1.5 text-xs font-mono border border-slate-200 rounded bg-white"
+                  className="w-full px-3 py-2 text-xs font-mono border border-slate-200 rounded-lg bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                 />
-                <span className="text-[10px] text-slate-400 block font-sans">
+                <span className="text-[11px] text-slate-400 block">
                   Default: 7 days. Beyond this marks CLOSED_EXPIRED.
                 </span>
               </div>

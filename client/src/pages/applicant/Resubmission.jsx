@@ -61,14 +61,22 @@ export default function Resubmission() {
     setError('');
 
     const reader = new FileReader();
+    const isPDF = selected.name.toLowerCase().endsWith('.pdf');
+    
     reader.onload = (event) => {
       setFile({
         name: selected.name,
         size: selected.size,
         content: event.target.result,
+        mimeType: isPDF ? 'application/pdf' : 'text/plain',
       });
     };
-    reader.readAsText(selected);
+    
+    if (isPDF) {
+      reader.readAsDataURL(selected);
+    } else {
+      reader.readAsText(selected);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -172,7 +180,7 @@ export default function Resubmission() {
           {/* Replacement Upload Form */}
           <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-xs space-y-5">
             <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-              Upload Replacement Specimen File
+              Upload Replacement Document
             </h3>
 
             {error && (
@@ -204,14 +212,14 @@ export default function Resubmission() {
                 <Upload className="w-5 h-5" />
               </div>
               <span className="text-xs font-semibold text-slate-800 block mt-1">
-                {file ? file.name : 'Select or drop replacement .txt specimen'}
+                {file ? file.name : 'Select or drop replacement document (PDF or TXT)'}
               </span>
               <span className="text-[11px] text-slate-400 block">
-                {file ? `${formatFileSize(file.size)} · Ready to submit` : 'UTF-8 text file · Max 1 MB'}
+                {file ? `${formatFileSize(file.size)} · Ready to submit` : 'PDF or TXT file · Max 10 MB'}
               </span>
               <input
                 type="file"
-                accept=".txt"
+                accept=".pdf,.txt"
                 onChange={handleFileChange}
                 className="hidden"
               />

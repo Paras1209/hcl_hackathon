@@ -19,11 +19,20 @@ export default function StatusTracking() {
       let targetId = id;
 
       if (!targetId) {
-        const myApps = await applicationsApi.getMyApplications();
-        if (myApps.success && myApps.data.length > 0) {
-          targetId = myApps.data[0].applicationId;
+        // Try to get from current user context
+        const currentUser = JSON.parse(sessionStorage.getItem('onboardiq_demo_user') || '{}');
+        if (currentUser && currentUser.applicationId) {
+          targetId = currentUser.applicationId;
         } else {
-          targetId = 'A2000004';
+          // Try to fetch user's applications
+          const myApps = await applicationsApi.getMyApplications();
+          if (myApps.success && myApps.data.length > 0) {
+            targetId = myApps.data[0].applicationId;
+          } else {
+            setError('No applications found. Please submit an application first.');
+            setLoading(false);
+            return;
+          }
         }
       }
 

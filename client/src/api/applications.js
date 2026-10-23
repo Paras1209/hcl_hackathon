@@ -7,31 +7,37 @@ export const applicationsApi = {
    */
   async createApplication(formData, uploadedFiles = []) {
     try {
+      console.log('Creating application with', uploadedFiles.length, 'files');
+      
       // Prepare multipart form data
       const formDataObj = new FormData();
       
-      // Add form fields
+      // Add form fields (keep camelCase, backend supports both)
       Object.keys(formData).forEach((key) => {
-        if (formData[key] !== undefined && formData[key] !== null) {
+        if (formData[key] !== undefined && formData[key] !== null && key !== 'consentKYC') {
           formDataObj.append(key, formData[key]);
         }
       });
       
-      // Add files
-      uploadedFiles.forEach((file) => {
-        if (file.file instanceof File) {
-          formDataObj.append('documents', file.file, file.name);
+      // Add files with their declared type as fieldname
+      uploadedFiles.forEach((fileObj) => {
+        if (fileObj.file instanceof File) {
+          // Use declaredType as the field name for backend processing
+          formDataObj.append('documents', fileObj.file);
         }
       });
 
+      console.log('Sending application to backend...');
       const response = await apiClient.post('/applications', formDataObj, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
+      console.log('Application created successfully:', response);
       return response;
     } catch (error) {
-      console.warn('Backend application creation failed, falling back to mock', error);
-      return await this.createApplicationMock(formData, uploadedFiles);
+      console.error('Backend application creation failed:', error);
+      showToast('Failed to submit application. Please try again.', 'error');
+      throw error;
     }
   },
 
@@ -102,6 +108,46 @@ export const applicationsApi = {
       console.warn('Failed to get my applications from backend', error);
       return await this.getMyApplicationsMock();
     }
+  },
+
+  /**
+   * Mock fallback for getMyApplications
+   */
+  async getMyApplicationsMock() {
+    await delay(200);
+    const currentUser = mockDb.getCurrentUser();
+    const apps = mockDb.getApplications();
+    
+    // Filter applications by current user
+    let userApps = [];
+    if (currentUser && currentUser.email) {
+      userApps = apps.filter(app => app.email === currentUser.email);
+    } else if (currentUser && currentUser.applicationId) {
+      userApps = apps.filter(app => app.applicationId === currentUser.applicationId);
+    }
+    
+    return { success: true, data: userApps };
+  },
+
+  /**
+   * Mock fallback for getApplications
+   */
+  async getApplicationsMock(filters = {}) {
+    await delay(200);
+    let apps = mockDb.getApplications();
+
+    // Apply filters
+    if (filters.status && filters.status !== 'ALL') {
+      apps = apps.filter(app => app.status === filters.status);
+    }
+    if (filters.riskCategory && filters.riskCategory !== 'ALL') {
+      apps = apps.filter(app => app.riskCategory === filters.riskCategory);
+    }
+    if (filters.assignedOfficer) {
+      apps = apps.filter(app => app.assignedOfficer === filters.assignedOfficer);
+    }
+
+    return { success: true, data: apps };
   },
 
   /**

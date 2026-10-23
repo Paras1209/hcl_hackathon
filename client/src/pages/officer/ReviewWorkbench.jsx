@@ -96,11 +96,11 @@ export default function ReviewWorkbench() {
 
     setCorrectionSubmitting(true);
     try {
-      const res = await reviewApi.submitFieldCorrection(application.applicationId, {
+      const res = await reviewApi.correctExtractedField(application.applicationId, {
         docId: selectedFieldToCorrect.docId,
-        field: selectedFieldToCorrect.field,
+        fieldName: selectedFieldToCorrect.fieldName,
         correctedValue,
-        correctionReason,
+        reason: correctionReason,
       });
 
       if (res.success) {
@@ -119,7 +119,7 @@ export default function ReviewWorkbench() {
   const handleConfirmRecommendation = async () => {
     setRecommendationSubmitting(true);
     try {
-      const res = await reviewApi.submitRecommendation(application.applicationId, {
+      const res = await reviewApi.submitOfficerRecommendation(application.applicationId, {
         action: recommendationAction,
         comment: recommendationComment,
       });

@@ -86,6 +86,31 @@ export const authApi = {
     }
   },
 
+  /**
+   * Switch demo role (for evaluation mode)
+   */
+  async switchRole(roleKey) {
+    await delay(150);
+    
+    let user = null;
+    if (roleKey === 'APPLICANT') {
+      user = DEMO_USERS.APPLICANT;
+    } else if (roleKey === 'OFFICER') {
+      user = DEMO_USERS.OFFICER;
+    } else if (roleKey === 'OFFICER_2') {
+      user = DEMO_USERS.OFFICER_2;
+    } else if (roleKey === 'CHECKER') {
+      user = DEMO_USERS.CHECKER;
+    } else {
+      throw new Error(`Unknown role key: ${roleKey}`);
+    }
+
+    mockDb.setCurrentUser(user);
+    localStorage.setItem('onboardiq_auth_token', `mock_jwt_token_${user.id}`);
+    
+    return { success: true, data: user };
+  },
+
   // ===== FALLBACK MOCK METHODS =====
   async loginMock({ email, password, journey, role }) {
     await delay(300);

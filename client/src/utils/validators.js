@@ -117,24 +117,26 @@ export function validateApplicationForm(values) {
  * Validates document upload files
  */
 export function validateDocumentFile(file) {
-  const MAX_SIZE = 1 * 1024 * 1024; // 1 MB
+  const MAX_SIZE = 10 * 1024 * 1024; // 10 MB for PDFs
 
   if (!file) {
     return { valid: false, error: 'No file selected' };
   }
 
   const extension = file.name.split('.').pop().toLowerCase();
-  if (extension !== 'txt') {
+  const ALLOWED_EXTENSIONS = ['pdf', 'txt'];
+  
+  if (!ALLOWED_EXTENSIONS.includes(extension)) {
     return {
       valid: false,
-      error: `Unsupported file format (.${extension}). Core hackathon implementation requires UTF-8 plain text (.txt) files.`,
+      error: `Unsupported file format (.${extension}). Please upload PDF or TXT files only.`,
     };
   }
 
   if (file.size > MAX_SIZE) {
     return {
       valid: false,
-      error: `File size exceeds 1 MB limit (${(file.size / (1024 * 1024)).toFixed(2)} MB). Please upload a smaller file.`,
+      error: `File size exceeds 10 MB limit (${(file.size / (1024 * 1024)).toFixed(2)} MB). Please upload a smaller file.`,
     };
   }
 

@@ -45,8 +45,10 @@ export default function DocumentUpload() {
       }
 
       const reader = new FileReader();
+      const isPDF = file.name.toLowerCase().endsWith('.pdf');
+      
       reader.onload = (event) => {
-        const text = event.target.result;
+        const content = event.target.result;
         const newDoc = {
           docId: `D${Date.now().toString().slice(-7)}`,
           applicationId: activeApp?.applicationId || 'A2000004',
@@ -55,14 +57,21 @@ export default function DocumentUpload() {
           declaredDocType: DOCUMENT_TYPES.OTHER,
           classifiedDocType: DOCUMENT_TYPES.OTHER,
           docTypeConfidence: 0.95,
-          textContent: text,
+          textContent: isPDF ? '[PDF Document - Binary Content]' : content,
+          fileContent: isPDF ? content : null,
+          mimeType: isPDF ? 'application/pdf' : 'text/plain',
           uploadedAt: new Date().toISOString(),
           extractedFields: [],
         };
         setDocuments((prev) => [newDoc, ...prev]);
         showToast(`Document ${file.name} uploaded successfully`, 'success');
       };
-      reader.readAsText(file);
+      
+      if (isPDF) {
+        reader.readAsDataURL(file);
+      } else {
+        reader.readAsText(file);
+      }
     });
   };
 
@@ -87,17 +96,17 @@ export default function DocumentUpload() {
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            UTF-8 OCR plain text stream files uploaded for identity and address verification.
+            Upload identity and address verification documents (PDF or TXT format).
           </p>
         </div>
 
         <label className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl transition-colors flex items-center gap-2 cursor-pointer shrink-0 shadow-xs">
           <Upload className="w-4 h-4" />
-          <span>Upload Specimen .txt</span>
+          <span>Upload Documents</span>
           <input
             type="file"
             multiple
-            accept=".txt"
+            accept=".pdf,.txt"
             onChange={handleFileUpload}
             className="hidden"
           />
@@ -108,14 +117,14 @@ export default function DocumentUpload() {
       <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-            Submitted Specimen Files ({documents.length})
+            Submitted Documents ({documents.length})
           </span>
-          <span className="text-xs text-slate-400 font-medium">Encoding: UTF-8</span>
+          <span className="text-xs text-slate-400 font-medium">PDF & TXT Files</span>
         </div>
 
         {documents.length === 0 ? (
           <div className="p-12 text-center text-slate-400 text-xs">
-            No specimen documents found in vault
+            No documents found in vault
           </div>
         ) : (
           <div className="divide-y divide-slate-100 text-xs">
@@ -151,7 +160,7 @@ export default function DocumentUpload() {
                   <button
                     onClick={() => setPreviewDoc(doc)}
                     className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-slate-200 cursor-pointer"
-                    title="Inspect plain text"
+                    title={doc.mimeType === 'application/pdf' ? 'View PDF' : 'Inspect plain text'}
                   >
                     <Eye className="w-4 h-4" />
                   </button>
@@ -165,7 +174,7 @@ export default function DocumentUpload() {
       {/* Preview Modal */}
       {previewDoc && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs font-sans">
-          <div className="bg-white text-slate-900 rounded-2xl max-w-xl w-full border border-slate-200 overflow-hidden shadow-2xl">
+          <div className="bg-white text-slate-900 rounded-2xl max-w-4xl w-full h-[90vh] border border-slate-200 overflow-hidden shadow-2xl flex flex-col">
             <div className="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between text-xs">
               <span className="font-bold text-slate-900 text-sm truncate">{previewDoc.fileName}</span>
               <button
@@ -175,10 +184,20 @@ export default function DocumentUpload() {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <pre className="p-5 text-xs font-mono max-h-96 overflow-y-auto whitespace-pre-wrap leading-relaxed select-text bg-slate-50/50 border-b border-slate-100 text-slate-800">
-              {previewDoc.textContent}
-            </pre>
-            <div className="p-3 bg-slate-50 text-right">
+            <div className="flex-1 overflow-hidden">
+              {previewDoc.mimeType === 'application/pdf' ? (
+                <iframe
+                  src={previewDoc.fileContent}
+                  className="w-full h-full"
+                  title="PDF Preview"
+                />
+              ) : (
+                <pre className="p-5 text-xs font-mono h-full overflow-y-auto whitespace-pre-wrap leading-relaxed select-text bg-slate-50/50 text-slate-800">
+                  {previewDoc.textContent}
+                </pre>
+              )}
+            </div>
+            <div className="p-3 bg-slate-50 border-t border-slate-100 text-right">
               <button
                 onClick={() => setPreviewDoc(null)}
                 className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold cursor-pointer"

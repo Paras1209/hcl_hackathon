@@ -31,51 +31,48 @@ export default function ApplicationForm() {
 
   // Form State
   const [formData, setFormData] = useState({
-    fullName: 'Ravi Kumar Sharma',
-    dob: '1992-04-10',
+    fullName: '',
+    dob: '',
     gender: 'MALE',
-    panNumber: 'ZZKPS5678R',
-    aadhaarLast4: '8832',
-    mobile: '9988776655',
-    email: 'ravi.k.sharma@example.com',
-    address: 'B-304, Green Meadows, Baner',
-    city: 'Pune',
-    state: 'Maharashtra',
-    pincode: '411045',
+    panNumber: '',
+    aadhaarLast4: '',
+    mobile: '',
+    email: '',
+    address: '',
+    city: '',
+    state: '',
+    pincode: '',
     occupationCode: 'SALARIED_PRIVATE',
-    annualIncome: 1400000,
-    consentKYC: true,
+    annualIncome: '',
+    consentKYC: false,
   });
 
   const [formErrors, setFormErrors] = useState({});
 
   // Document Upload State (Min 3 required)
-  const [uploadedFiles, setUploadedFiles] = useState([
-    {
-      id: 'doc-1',
-      name: 'pan_card_specimen.txt',
-      size: 1420,
-      declaredType: DOCUMENT_TYPES.PAN_CARD,
-      content: `INCOME TAX DEPARTMENT - GOVT OF INDIA\nPERMANENT ACCOUNT NUMBER CARD\nSYNTHETIC SPECIMEN - NOT A VALID DOCUMENT\nNAME: RAVI K SHARMA\nFATHER: MOHAN SHARMA\nDOB: 10/04/1992\nPAN: ZZKPS5678R`,
-    },
-    {
-      id: 'doc-2',
-      name: 'aadhaar_card_specimen.txt',
-      size: 1530,
-      declaredType: DOCUMENT_TYPES.AADHAAR_CARD,
-      content: `UNIQUE IDENTIFICATION AUTHORITY OF INDIA\nGOVERNMENT OF INDIA\nSYNTHETIC SPECIMEN - NOT A VALID DOCUMENT\nNAME: RAVI KUMAR SHARMA\nDOB: 10/04/1992\nGENDER: MALE\nAADHAAR: XXXX XXXX 8832`,
-    },
-    {
-      id: 'doc-3',
-      name: 'electricity_bill_specimen.txt',
-      size: 1850,
-      declaredType: DOCUMENT_TYPES.ELECTRICITY_BILL,
-      content: `MAHARASHTRA STATE ELECTRICITY DISTRIBUTION CO. LTD.\nSYNTHETIC SPECIMEN - NOT A VALID DOCUMENT\nCONSUMER NAME: RAVI KUMAR SHARMA\nBILL DATE: 15/02/2026\nADDRESS: B-304, Green Meadows, Baner, Pune\nPIN CODE: 411045`,
-    },
-  ]);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
 
   const [previewDoc, setPreviewDoc] = useState(null);
+  const [previewContent, setPreviewContent] = useState('');
   const [docUploadError, setDocUploadError] = useState('');
+
+  // Load preview content when preview doc changes
+  React.useEffect(() => {
+    if (previewDoc && previewDoc.file instanceof File) {
+      const isPDF = previewDoc.mimeType === 'application/pdf' || previewDoc.file.name.toLowerCase().endsWith('.pdf');
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPreviewContent(e.target.result);
+      };
+      if (isPDF) {
+        reader.readAsDataURL(previewDoc.file);
+      } else {
+        reader.readAsText(previewDoc.file);
+      }
+    } else if (previewDoc && previewDoc.content) {
+      setPreviewContent(previewDoc.content);
+    }
+  }, [previewDoc]);
 
   // Field change handler
   const handleInputChange = (e) => {
@@ -114,32 +111,32 @@ export default function ApplicationForm() {
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const text = event.target.result;
-        let inferredType = DOCUMENT_TYPES.OTHER;
-        const lowerName = file.name.toLowerCase();
-        if (lowerName.includes('pan')) inferredType = DOCUMENT_TYPES.PAN_CARD;
-        else if (lowerName.includes('aadhaar')) inferredType = DOCUMENT_TYPES.AADHAAR_CARD;
-        else if (lowerName.includes('electricity') || lowerName.includes('bill'))
-          inferredType = DOCUMENT_TYPES.ELECTRICITY_BILL;
-        else if (lowerName.includes('bank') || lowerName.includes('statement'))
-          inferredType = DOCUMENT_TYPES.BANK_STATEMENT;
-        else if (lowerName.includes('licence') || lowerName.includes('dl'))
-          inferredType = DOCUMENT_TYPES.DRIVING_LICENCE;
+      // Infer document type from filename
+      let inferredType = DOCUMENT_TYPES.OTHER;
+      const lowerName = file.name.toLowerCase();
+      if (lowerName.includes('pan')) inferredType = DOCUMENT_TYPES.PAN_CARD;
+      else if (lowerName.includes('aadhaar')) inferredType = DOCUMENT_TYPES.AADHAAR_CARD;
+      else if (lowerName.includes('electricity') || lowerName.includes('bill'))
+        inferredType = DOCUMENT_TYPES.ELECTRICITY_BILL;
+      else if (lowerName.includes('bank') || lowerName.includes('statement'))
+        inferredType = DOCUMENT_TYPES.BANK_STATEMENT;
+      else if (lowerName.includes('licence') || lowerName.includes('dl'))
+        inferredType = DOCUMENT_TYPES.DRIVING_LICENCE;
 
-        const newDoc = {
-          id: `doc-${Date.now()}-${Math.random()}`,
-          name: file.name,
-          size: file.size,
-          declaredType: inferredType,
-          content: text,
-        };
-
-        setUploadedFiles((prev) => [...prev, newDoc]);
+      const newDoc = {
+        id: `doc-${Date.now()}-${Math.random()}`,
+        name: file.name,
+        size: file.size,
+        declaredType: inferredType,
+        file: file, // Store the actual File object
+        mimeType: file.type || (file.name.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'text/plain'),
       };
-      reader.readAsText(file);
+
+      setUploadedFiles((prev) => [...prev, newDoc]);
     });
+
+    // Reset input
+    e.target.value = '';
   };
 
   const handleRemoveDoc = (id) => {
@@ -155,8 +152,8 @@ export default function ApplicationForm() {
   // Step 2 Validation (at least 3 documents required)
   const handleNextToReview = () => {
     if (uploadedFiles.length < 3) {
-      setDocUploadError('Case study requirement: Please upload at least three .txt specimen documents.');
-      showToast('At least 3 specimen documents are required before submission', 'error');
+      setDocUploadError('Minimum requirement: Please upload at least three documents.');
+      showToast('At least 3 documents are required before submission', 'error');
       return;
     }
     setDocUploadError('');
@@ -168,11 +165,23 @@ export default function ApplicationForm() {
     setLoading(true);
     try {
       const res = await applicationsApi.createApplication(formData, uploadedFiles);
-      if (res.success) {
+      console.log('Application creation response:', res);
+      
+      if (res.success && res.data && res.data.applicationId) {
+        // Update current user with the new application ID
+        const currentUser = JSON.parse(sessionStorage.getItem('onboardiq_demo_user') || '{}');
+        if (currentUser) {
+          currentUser.applicationId = res.data.applicationId;
+          sessionStorage.setItem('onboardiq_demo_user', JSON.stringify(currentUser));
+        }
+        
         showToast(`Application ${res.data.applicationId} registered successfully`, 'success');
         navigate(`/applicant/status/${res.data.applicationId}`);
+      } else {
+        throw new Error('Application created but ID not returned');
       }
     } catch (err) {
+      console.error('Application submission error:', err);
       showToast(err.message || 'Submission failed', 'error');
     } finally {
       setLoading(false);
@@ -498,10 +507,10 @@ export default function ApplicationForm() {
           <div className="border-b border-slate-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h2 className="text-base font-bold text-slate-900">
-                Upload Verification Specimens
+                Upload Verification Documents
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                Upload at least three UTF-8 .txt files representing OCR extracted identity documents.
+                Upload at least three documents (PDF or TXT) representing identity verification records.
               </p>
             </div>
             <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
@@ -516,16 +525,16 @@ export default function ApplicationForm() {
             </div>
             <div className="text-center">
               <span className="text-xs font-semibold text-slate-800 block mt-1">
-                Select or drop .txt specimen files
+                Select or drop documents (PDF or TXT)
               </span>
               <span className="text-[11px] text-slate-400 mt-0.5 block">
-                UTF-8 text · Max 1 MB each · At least 3 documents required
+                PDF or TXT files · Max 10 MB each · At least 3 documents required
               </span>
             </div>
             <input
               type="file"
               multiple
-              accept=".txt"
+              accept=".pdf,.txt"
               onChange={handleFileUpload}
               className="hidden"
             />
@@ -741,7 +750,7 @@ export default function ApplicationForm() {
       {/* Preview Modal */}
       {previewDoc && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs font-sans">
-          <div className="bg-white text-slate-900 rounded-2xl max-w-xl w-full border border-slate-200 overflow-hidden shadow-2xl">
+          <div className="bg-white text-slate-900 rounded-2xl max-w-4xl w-full h-[90vh] border border-slate-200 overflow-hidden shadow-2xl flex flex-col">
             <div className="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between text-xs">
               <span className="font-bold text-slate-900 text-sm">{previewDoc.name}</span>
               <button
@@ -751,10 +760,20 @@ export default function ApplicationForm() {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <pre className="p-5 text-xs font-mono max-h-80 overflow-y-auto whitespace-pre-wrap leading-relaxed select-text bg-slate-50/50 border-b border-slate-100 text-slate-800">
-              {previewDoc.content}
-            </pre>
-            <div className="p-3 bg-slate-50 text-right">
+            <div className="flex-1 overflow-hidden">
+              {previewDoc.mimeType === 'application/pdf' || previewDoc.file.name.toLowerCase().endsWith('.pdf') ? (
+                <iframe
+                  src={previewContent}
+                  className="w-full h-full"
+                  title="PDF Preview"
+                />
+              ) : (
+                <pre className="p-5 text-xs font-mono h-full overflow-y-auto whitespace-pre-wrap leading-relaxed select-text bg-slate-50/50 text-slate-800">
+                  {previewContent || 'Loading...'}
+                </pre>
+              )}
+            </div>
+            <div className="p-3 bg-slate-50 border-t border-slate-100 text-right">
               <button
                 onClick={() => setPreviewDoc(null)}
                 className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold cursor-pointer"

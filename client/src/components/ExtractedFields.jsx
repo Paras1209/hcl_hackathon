@@ -29,20 +29,17 @@ export default function ExtractedFields({
 
   const getDeclaredValueForField = (fieldName) => {
     switch (fieldName) {
+      case 'doc_type':
       case 'name':
-        return application.fullName;
       case 'dob':
-        return application.dob;
       case 'gender':
-        return application.gender;
       case 'pan_number':
-        return application.panNumber;
       case 'aadhaar_last4':
-        return application.aadhaarLast4;
-      case 'pincode':
-        return application.pincode;
       case 'address':
-        return application.address;
+      case 'pincode':
+      case 'document_date':
+      case 'valid_until':
+        return null;
       default:
         return null;
     }
@@ -209,7 +206,7 @@ export default function ExtractedFields({
             </thead>
             <tbody className="divide-y divide-slate-100">
               {fields.map((f, idx) => {
-                const declaredVal = getDeclaredValueForField(f.field);
+                const declaredVal = getDeclaredValueForField(f.fieldName);
                 const hasMismatch =
                   declaredVal !== null &&
                   f.value !== null &&
@@ -224,13 +221,13 @@ export default function ExtractedFields({
                     }`}
                   >
                     <td className="py-3 px-4 font-semibold text-slate-900 whitespace-nowrap">
-                      {getFieldLabel(f.field)}
+                      {getFieldLabel(f.fieldName)}
                     </td>
 
                     <td className="py-3 px-4 text-slate-600 font-medium whitespace-nowrap">
-                      {f.field === 'pan_number'
+                      {f.fieldName === 'pan_number'
                         ? maskPAN(declaredVal || '')
-                        : f.field === 'aadhaar_last4'
+                        : f.fieldName === 'aadhaar_last4'
                         ? maskAadhaar(declaredVal || '')
                         : declaredVal || <span className="text-slate-300 italic">—</span>}
                     </td>
@@ -238,9 +235,9 @@ export default function ExtractedFields({
                     <td className="py-3 px-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
                         <span className={`font-semibold ${hasMismatch ? 'text-amber-800' : 'text-slate-900'}`}>
-                          {f.field === 'pan_number'
+                          {f.fieldName === 'pan_number'
                             ? maskPAN(f.value || '')
-                            : f.field === 'aadhaar_last4'
+                            : f.fieldName === 'aadhaar_last4'
                             ? maskAadhaar(f.value || '')
                             : f.value || <span className="text-slate-300 italic">Not detected</span>}
                         </span>
@@ -287,8 +284,8 @@ export default function ExtractedFields({
                         onClick={() =>
                           onOpenCorrectionModal({
                             docId: activeDoc.docId,
-                            field: f.field,
-                            fieldName: getFieldLabel(f.field),
+                            field: f.fieldName,
+                            fieldName: getFieldLabel(f.fieldName),
                             currentValue: f.value,
                             declaredValue: declaredVal,
                             confidence: f.confidence,

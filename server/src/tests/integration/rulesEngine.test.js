@@ -6,10 +6,10 @@
 const { describe, it, expect, beforeAll } = require('vitest');
 const path = require('path');
 const fs = require('fs');
-const { evaluateApplication } = require('../../src/services/rulesEngine');
+const { evaluateApplication } = require('../../services/rulesEngine');
 const { parseCSV, parseJSONL, WORKED_EXAMPLES, getApplicationDocuments, getDocumentText } = require('./setup');
 
-const DATASET_DIR = path.join(__dirname, '..', '..', 'dataset');
+const DATASET_DIR = path.join(__dirname, '..', '..', '..', '..', 'dataset');
 const SAMPLE_APPS_FILE = path.join(DATASET_DIR, 'case_02_applications_sample_V1.0.csv');
 const SAMPLE_DOC_TEXT_FILE = path.join(DATASET_DIR, 'case_02_document_text_sample_V1.0.jsonl');
 const SAMPLE_EXTRACTION_FILE = path.join(DATASET_DIR, 'case_02_extraction_mock_sample_V1.0.csv');

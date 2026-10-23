@@ -49,6 +49,29 @@ export const applicationsApi = {
   },
 
   /**
+   * Mock fallback for getApplication
+   */
+  async getApplicationMock(applicationId) {
+    await delay(200);
+    const apps = mockDb.getApplications();
+    const app = apps.find((a) => a.applicationId === applicationId);
+    
+    if (!app) {
+      throw new Error(`Application ${applicationId} not found`);
+    }
+
+    // Get associated documents
+    const docs = mockDb.getDocuments();
+    const applicationDocs = docs.filter((d) => d.applicationId === applicationId);
+    
+    // Get audit trail
+    const audit = mockDb.getAudit();
+    const applicationAudit = audit.filter((a) => a.applicationId === applicationId);
+
+    return { success: true, data: { ...app, documents: applicationDocs, auditHistory: applicationAudit } };
+  },
+
+  /**
    * Get all applications (for officer views)
    */
   async getApplications(filters = {}) {

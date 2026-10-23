@@ -1,16 +1,19 @@
 /**
  * Extraction Service Interface
- * Pluggable provider architecture supporting 'mock' and 'ai' providers.
+ * Pluggable provider architecture supporting 'mock' and 'textract' providers.
  */
 
 const { MockExtractionProvider } = require('./extractionProviders/mockProvider');
+const { TextractProvider } = require('./extractionProviders/textractProvider');
 
 class ExtractionService {
   constructor(providerName = process.env.EXTRACTION_PROVIDER || 'mock') {
     this.providerName = providerName;
     this.mockProvider = new MockExtractionProvider();
+    this.textractProvider = new TextractProvider();
     this.providers = {
       mock: this.mockProvider,
+      textract: this.textractProvider,
     };
   }
 
@@ -31,9 +34,16 @@ class ExtractionService {
    */
   async extractDocument(docId, docText = '', declaredDocType = '') {
     const provider = this.providers[this.providerName] || this.mockProvider;
+    
     try {
+      // Special handling for Textract to ensure it's initialized
+      if (this.providerName === 'textract' && this.textractProvider.initialize) {
+        await this.textractProvider.initialize();
+      }
+      
       return await provider.extract(docId, docText, declaredDocType);
     } catch (err) {
+      console.error(`Extraction failed for ${docId}:`, err.message);
       return {
         doc_id: docId,
         classified_doc_type: declaredDocType || 'OTHER',

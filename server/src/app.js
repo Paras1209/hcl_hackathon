@@ -5,6 +5,7 @@
  */
 
 const express = require('express');
+const cors = require('cors');
 const applicationRoutes = require('./routes/applicationRoutes');
 const batchRoutes = require('./routes/batchRoutes');
 const reviewRoutes = require('./routes/reviewRoutes'); // Dev 3
@@ -12,6 +13,16 @@ const checkerRoutes = require('./routes/checkerRoutes'); // Dev 3
 const dashboardRoutes = require('./routes/dashboardRoutes'); // Dev 3
 
 const app = express();
+
+// CORS middleware
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
 
 // Body parser
 app.use(express.json({ limit: '10mb' }));

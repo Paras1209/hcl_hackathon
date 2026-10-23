@@ -18,12 +18,22 @@ function maskPan(pan) {
   return `${pan.slice(0, 3)}XXXXX${pan.slice(8)}`;
 }
 
+let mongoose;
+try {
+  mongoose = require('mongoose');
+} catch (e) {
+  mongoose = null;
+}
+
 /**
- * Helper to dynamically load Mongoose Application model if available
+ * Helper to dynamically load Mongoose Application model if MongoDB is connected
  */
 function getApplicationModel() {
   try {
-    return require('../models/Application');
+    if (mongoose && mongoose.connection && mongoose.connection.readyState === 1) {
+      return require('../models/Application');
+    }
+    return null;
   } catch (e) {
     return null;
   }

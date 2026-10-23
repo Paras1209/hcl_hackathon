@@ -1,5 +1,13 @@
 # OnboardIQ Implementation Roadmap
 
+> **⚠️ IMPORTANT:** This document is for SOLO development or UNASSIGNED team work.
+> 
+> **For 4-developer parallel work (3 hours), see:**
+> - **TEAM_WORK_DISTRIBUTION.md** - Full team coordination plan
+> - **DEV4_YOUR_GUIDE.md** - Developer 4 (Frontend + Notifications) detailed guide
+
+---
+
 ## Quick Start (Hour 0:00 - 0:30)
 
 ### 1. Project Setup

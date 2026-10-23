@@ -9,6 +9,7 @@
 ## 👥 Optimized Team Distribution
 
 ### Developer 1 - Core Application Flow & Rules Engine (CRITICAL PATH)
+**Name: Himanshu**
 **Why this matters:** Rules engine is the heart - must be perfect. Combining with application flow reduces handoffs.
 
 #### File Ownership:
@@ -70,6 +71,7 @@ exports.evaluateApplication = (application, documents, extractedFields, config, 
 ---
 
 ### Developer 2 - Auth, Models & Document Storage (FOUNDATION)
+**Name: Vaibhav**
 **Why this matters:** Everyone needs auth and models. Get these stable early.
 
 #### File Ownership:
@@ -153,6 +155,7 @@ exports.authorize = (...roles) => (req, res, next) => { /* Role check */ };
 ---
 
 ### Developer 3 - Workflow, Review & Checker (BUSINESS LOGIC)
+**Name: Paras (YOU)**
 **Why this matters:** Maker-checker workflow is core requirement. Isolated from rules engine.
 
 #### File Ownership:
@@ -221,7 +224,8 @@ exports.validateMakerChecker = (application, checkerUserId) => {
 
 ---
 
-### Developer 4 - Frontend + Notifications (YOU) (USER EXPERIENCE)
+### Developer 4 - Frontend + Notifications (USER EXPERIENCE)
+**Name: Rishabh**
 **Why this matters:** Frontend can develop in parallel with mocked APIs. Notifications complete the loop.
 
 #### File Ownership:
